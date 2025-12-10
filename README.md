@@ -1,0 +1,105 @@
+---
+title: "Learning Belief Functions from Data via Polyhedral Methods — Computational Supplement"
+output: github_document
+---
+
+# Overview
+
+This repository contains the **complete computational supplement** to the paper:
+
+> **Learning Belief Functions from Data via Polyhedral Methods**  
+> *Kybernetika, 2025*
+
+The included R Markdown notebook reproduces all numerical results:
+
+- Jeffreys-based pseudo-belief construction  
+- Upper Approximation Procedure (UAP)  
+- Dominance polytope construction  
+- Vertex enumeration with `rcdd`  
+- LP-based approximations under L1, HD, CW  
+- Tables **1–10** exactly as in the article  
+
+---
+
+# Repository Structure
+
+```
+belief-functions-polyhedral-learning/
+│
+├── Kybernetika_2025.Rmd
+├── README.Rmd
+└── LICENSE
+```
+
+---
+
+# Dependencies
+
+```r
+install.packages(c("lpSolve","rcdd","knitr"))
+```
+
+---
+
+# Reproducing All Tables
+
+Open and knit:
+
+```r
+file.edit("Kybernetika_2025.Rmd")
+```
+
+Tables 1–10 are generated automatically.
+
+---
+
+# Methodological Summary
+
+## Jeffreys pseudo-belief function
+
+Constructed via:
+
+```r
+jeffreys_pseudo_belief_function(Omega, counts, alpha)
+```
+
+## Upper Approximation Procedure (UAP)
+
+```r
+upper_approximation(Omega, g_values)
+```
+
+## Dominance Polytope
+
+```r
+build_lp_constraints(Omega, g_values)
+```
+
+## LP Approximations
+
+```r
+solve_lp_for_objective(Omega, g_values, objective_L1)
+```
+
+## Vertex Enumeration (Table 10)
+
+```r
+enumerate_vertices(Omega, g_values)
+compute_vertex_minima()
+```
+
+---
+
+# Citation
+
+```
+Kratochvíl, V., Jiroušek, R., Daniel, M. (2025).
+Learning Belief Functions from Data via Polyhedral Methods.
+Kybernetika.
+```
+
+---
+
+# License
+
+MIT License
