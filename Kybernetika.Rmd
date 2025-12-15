@@ -59,7 +59,6 @@ set.seed(2025)
 library(lpSolve)
 library(knitr)
 
-
 # ===========================
 # Auxiliary functions
 # ===========================
