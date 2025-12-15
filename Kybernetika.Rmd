@@ -3,18 +3,19 @@ title: 'Learning Belief Functions from Data: Experimental Supplement'
 author: "Václav Kratochvíl, Radim Jiroušek, Milan Daniel"
 date: "`r format(Sys.Date(), '%B %d, %Y')`"
 output:
+  github_document:
+    toc: true
   html_document:
     toc: true
     number_sections: true
     theme: readable
-  pdf_document:
-    toc: true
 ---
 
 # Introduction
 
 This notebook provides a compact computational companion to the paper  
 **“Learning Belief Functions from Data via Polyhedral Methods” (Kybernetika, 2025)**.
+
 
 Its purpose is to **reproduce and document
 all worked examples from the paper**:
@@ -35,7 +36,7 @@ reproducing Tables 1, 4, 5, and 6.
 objectives (L1, HD, CW) to obtain LP-based upper approximations, reproducing
 Tables 7–9.
 4. For the **quaternary Example 5**, compares the LP solutions with the outcome of
-UAP in a single summary table (**Table 9, A+LP**).
+UAP in a single summary table.
 
 The notebook therefore serves as an executable “log file” for all numerical tables
 in the paper and as a reference implementation of the UAP and LP-based upper
@@ -166,7 +167,7 @@ normalize_counts <- function(counts_named, subsets) {
 # Construct Jeffreys-based pseudo-belief function g(A):
 #   g(A) = Jeffreys lower bound for f(A)
 #   where "successes" for A is the total number of observations
-#   assigned to subsets B ⊆ A.
+#   assigned to subsets B \subseteq A.
 #
 # The function automatically enforces g(Omega) = 1, consistently with the paper
 # ------------------------------------------------------------
@@ -331,7 +332,7 @@ upper_approximation <- function(Omega, g_values) {
   
   
   # 3) Enforce normalization: g(Omega) = 1
-  # Find index of Ω = full set
+  # Find index of \Omega = full set
   full_idx <- which(subset_names == subset_name(Omega))
   g_values[full_idx] <- 1
   
@@ -446,7 +447,7 @@ table <- uap_table(res_tilde, g_ternary_tilde)
 # print table
 knitr::kable(
   table,
-  caption = "Table 1 (modified) — UAP succeeds for the adjusted pseudo-belief function g̃.",
+  caption = "Table 1 (modified) — UAP succeeds for the adjusted pseudo-belief.",
   align = "lrrrr",
   row.names = FALSE
 )
@@ -507,7 +508,7 @@ tab4 <- uap_table(res4, g4_vals)
 # print table
 knitr::kable(
   tab4,
-  caption = "Table 4 — UAP failure for Jeffreys lower bounds with α = 0.05.",
+  caption = "Table 4 — UAP failure for Jeffreys lower bounds with alpha = 0.05.",
   align = "lrrrr",
   row.names = FALSE
 )
@@ -552,7 +553,7 @@ tab5 <- uap_table(res5, g5_vals)
 # Knit-friendly table
 knitr::kable(
   tab5,
-  caption = "Table 5 — UAP succeeds for Jeffreys lower bounds with α = 0.02.",
+  caption = "Table 5 — UAP succeeds for Jeffreys lower bounds with alpha = 0.02.",
   align = "lrrrr",
   row.names = FALSE
 )
@@ -579,11 +580,11 @@ the pseudo-belief function, and even minimal adjustments—either statistical
 upper approximation exists.
 
 ```{r}
-## Table 6 — Discounting δ = 0.02 applied to Jeffreys g from Table 4
+## Table 6 — Discounting delta = 0.02 applied to Jeffreys g from Table 4
 
 delta <- 0.02
 
-# Start from g of Table 4 (α = 0.05)
+# Start from g of Table 4 (alpha = 0.05)
 g4_vals <- g4_res$g
 names(g4_vals) <- g4_res$subset_names
 
@@ -606,7 +607,7 @@ tab6 <- uap_table(res6, g6_vals)
 # print table
 knitr::kable(
   tab6,
-  caption = "Table 6 — UAP succeeds after Shafer discounting with δ = 0.02.",
+  caption = "Table 6 — UAP succeeds after Shafer discounting with delta = 0.02.",
   align = "lrrrr",
   row.names = FALSE
 )
@@ -675,7 +676,7 @@ build_lp_constraints <- function(Omega, g_values) {
   stopifnot(length(g_values) == n_vars)
   
   # -------------------------------
-  # Dominance constraints: M_bel m ≥ g
+  # Dominance constraints: M_bel m >= g
   # -------------------------------
   M_dom <- matrix(0, nrow=n_vars, ncol=n_vars)
   for (i in seq_along(subsets)) {
@@ -685,7 +686,7 @@ build_lp_constraints <- function(Omega, g_values) {
   b_dom <- g_values
   
   # -------------------------------
-  # Nonnegativity: m ≥ 0
+  # Nonnegativity: m >= 0
   # -------------------------------
   M_nonneg <- diag(n_vars)
   b_nonneg <- rep(0, n_vars)
@@ -696,8 +697,8 @@ build_lp_constraints <- function(Omega, g_values) {
   
   # -------------------------------
   # Equalities:
-  #   Σ m(A) = 1
-  #   m(∅)   = 0
+  #   sum m(A) = 1
+  #   m(emptyset)   = 0
   # -------------------------------
   M_eq <- matrix(0, nrow=2, ncol=n_vars)
   M_eq[1, ] <- 1         # normalization
@@ -820,19 +821,19 @@ objective_CW <- function(subsets, Omega) {
 # ================================================================
 # solve_lp_for_objective()
 # ---------------------------------------------------------------
-# Solves the linear program defining the upper approximation f ≥ g
+# Solves the linear program defining the upper approximation f >= g
 # for a chosen linear objective function in the belief space.
 #
 # The LP is formulated over the basic probability assignment vector m,
 # subject to the standard belief-function constraints:
 #
-#   (1)  M_bel * m   >= g    (dominance: f(A) ≥ g(A))
+#   (1)  M_bel * m   >= g    (dominance: f(A) >= g(A))
 #   (2)  m(A)        >= 0    (non-negativity)
-#   (3)  m(∅)        =  0    (empty set has zero mass)
+#   (3)  m(emptyset)        =  0    (empty set has zero mass)
 #   (4)  sum_A m(A)  =  1    (normalization)
 #
 # The objective is always of the form:
-#          minimize   Σ_A  w(A) * m(A)
+#          minimize   sum_A  w(A) * m(A)
 # where w(A) is supplied by obj_fun (L1, HD, CW, …).
 #
 # Input:
@@ -849,7 +850,7 @@ objective_CW <- function(subsets, Omega) {
 # ================================================================
 solve_lp_for_objective <- function(Omega, g_values, obj_fun) {
   
-  # Construct all LP constraint matrices for f ≥ g
+  # Construct all LP constraint matrices for f >= g
   lp_data <- build_lp_constraints(Omega, g_values)
   
   subsets      <- lp_data$subsets
@@ -886,7 +887,7 @@ solve_lp_for_objective <- function(Omega, g_values, obj_fun) {
   m <- sol$solution
   names(m) <- subset_names
   
-  # Reconstruct belief f(A) = Σ_{B ⊆ A} m(B)
+  # Reconstruct belief f(A) = sum_{B \subseteq A} m(B)
   f <- sapply(subsets, function(A) {
     idx <- sapply(subsets, function(B) all(B %in% A))
     sum(m[idx])
