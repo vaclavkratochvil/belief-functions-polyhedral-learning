@@ -19,7 +19,9 @@ procedures presented in the paper.
 
 The repository includes:
 
-- **R Markdown (`.Rmd`) files** implementing:
+- **R Markdown (`.Rmd`) file** [Kybernetika
+  manuscript](https://github.com/vaclavkratochvil/belief-functions-polyhedral-learning/blob/main/Kybernetika.md)
+  implementing:
   - computation of Jeffreys confidence interval lower bounds,
   - construction of pseudo-belief functions from data,
   - upper approximation of pseudo-belief functions by belief functions,
@@ -53,7 +55,7 @@ directly in R. Users may provide their own input data or organize the
 code into custom test cases depending on their experimental needs.
 
 ``` r
-rmarkdown::render("Supplementary_Material_WUPES2025.Rmd")
+rmarkdown::render("Kybernetika.Rmd")
 ```
 
 The compiled output will be generated automatically.
