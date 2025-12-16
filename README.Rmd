@@ -1,5 +1,5 @@
 ---
-title: "Learning Belief Functions from Data via Polyhedral Methods ? Computational Supplement"
+title: "Learning Belief Functions from Data via Polyhedral Methods: Computational Supplement"
 output: github_document
 ---
 
