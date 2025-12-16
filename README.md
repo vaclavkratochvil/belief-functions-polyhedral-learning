@@ -77,10 +77,8 @@ also available via Binder:
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/vaclavkratochvil/belief-functions-polyhedral-learning/main?urlpath=rstudio&filepath=Kybernetika.Rmd)
 
 The Binder link opens RStudio with the main manuscript file
-(`Kybernetika.Rmd`) preloaded. Reviewers can reproduce the results by
-clicking *Knit* or by running individual code chunks interactively.
-
-------------------------------------------------------------------------
+(`Kybernetika.Rmd`) preloaded. The results can be reproduced by clicking
+*Knit* or by running individual code chunks interactively. —
 
 # Reproducibility
 
