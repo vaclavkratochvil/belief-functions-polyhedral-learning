@@ -5,102 +5,68 @@ output: github_document
 
 # Overview
 
-This repository contains the **complete computational supplement** to the paper:
+This repository contains supplementary materials accompanying the paper
 
-> **Learning Belief Functions from Data via Polyhedral Methods**  
-> *Kybernetika, 2025*
+**M. Daniel, R. Jiroušek, V. Kratochvíl**  
+*On Learning Belief Functions from Data Using Confidence Bounds*
 
-The included R Markdown notebook reproduces all numerical results:
-
-- Jeffreys-based pseudo-belief construction  
-- Upper Approximation Procedure (UAP)  
-- Dominance polytope construction  
-- Vertex enumeration with `rcdd`  
-- LP-based approximations under L1, HD, CW  
-- Tables **1?10** exactly as in the article  
+The goal of this repository is to ensure **computational transparency and reproducibility**
+of the numerical examples and optimization procedures presented in the paper.
 
 ---
 
-# Repository Structure
+# Content
 
-```
-belief-functions-polyhedral-learning/
--
-+?? Kybernetika_2025.Rmd
-+?? README.Rmd
-L?? LICENSE
-```
+The repository includes:
 
----
-
-
-# Dependencies
-
-```r
-install.packages(c("lpSolve","rcdd","knitr"))
-```
+- **R Markdown (`.Rmd`) files** implementing:
+  - computation of Jeffreys confidence interval lower bounds,
+  - construction of pseudo-belief functions from data,
+  - upper approximation of pseudo-belief functions by belief functions,
+  - linear programming formulations for selecting representative belief functions.
+- Compiled **HTML/PDF outputs** corresponding to the supplementary material.
 
 ---
 
-# Reproducing All Tables
+# Implementation
 
-Open and knit:
+All computations are implemented in **R** using standard libraries.
 
-```r
-file.edit("Kybernetika_2025.Rmd")
-```
+Main technologies:
+- **R (version ≥ 4.2)**
+- **R Markdown**
+- Base R statistical functions (`qbeta`)
+- Linear programming solvers (e.g. `lpSolve`)
 
-Tables 1?10 are generated automatically.
-
----
-
-# Methodological Summary
-
-## Jeffreys pseudo-belief function
-
-Constructed via:
-
-```r
-jeffreys_pseudo_belief_function(Omega, counts, alpha)
-```
-
-## Upper Approximation Procedure (UAP)
-
-```r
-upper_approximation(Omega, g_values)
-```
-
-## Dominance Polytope
-
-```r
-build_lp_constraints(Omega, g_values)
-```
-
-## LP Approximations
-
-```r
-solve_lp_for_objective(Omega, g_values, objective_L1)
-```
-
-## Vertex Enumeration (Table 10)
-
-```r
-enumerate_vertices(Omega, g_values)
-compute_vertex_minima()
-```
+All computations are deterministic; no stochastic components are used.
 
 ---
 
-# Citation
+# How to Run
 
+1. Open the project in **RStudio**.
+2. Open the main supplementary `.Rmd` file.
+3. Click **Knit** (HTML or PDF), or run:
+
+Alternatively, individual code blocks can be copied and executed directly in R.
+Users may provide their own input data or organize the code into custom test cases
+depending on their experimental needs.
+```r
+rmarkdown::render("Supplementary_Material_WUPES2025.Rmd")
 ```
-Kratochv?l, V., Jirou?ek, R., Daniel, M. (2025).
-Learning Belief Functions from Data via Polyhedral Methods.
-Kybernetika.
-```
+
+The compiled output will be generated automatically.
 
 ---
 
-# License
+# Reproducibility
 
-MIT License
+All numerical results reported in the paper can be reproduced by running the provided
+R Markdown files without any manual intervention.
+
+---
+
+# License and Usage
+
+The code is provided for **research and academic use**.
+If you use or adapt this material, please cite the associated paper.
