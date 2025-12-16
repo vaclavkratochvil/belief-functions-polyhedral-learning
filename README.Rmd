@@ -1,5 +1,5 @@
 ---
-title: "Learning Belief Functions from Data via Polyhedral Methods — Computational Supplement"
+title: "Learning Belief Functions from Data via Polyhedral Methods ? Computational Supplement"
 output: github_document
 ---
 
@@ -17,7 +17,7 @@ The included R Markdown notebook reproduces all numerical results:
 - Dominance polytope construction  
 - Vertex enumeration with `rcdd`  
 - LP-based approximations under L1, HD, CW  
-- Tables **1–10** exactly as in the article  
+- Tables **1?10** exactly as in the article  
 
 ---
 
@@ -26,12 +26,13 @@ The included R Markdown notebook reproduces all numerical results:
 ```
 belief-functions-polyhedral-learning/
 -
-+¦¦ Kybernetika_2025.Rmd
-+¦¦ README.Rmd
-L¦¦ LICENSE
++?? Kybernetika_2025.Rmd
++?? README.Rmd
+L?? LICENSE
 ```
 
 ---
+
 
 # Dependencies
 
@@ -49,7 +50,7 @@ Open and knit:
 file.edit("Kybernetika_2025.Rmd")
 ```
 
-Tables 1–10 are generated automatically.
+Tables 1?10 are generated automatically.
 
 ---
 
@@ -93,7 +94,7 @@ compute_vertex_minima()
 # Citation
 
 ```
-Kratochvíl, V., Jiroušek, R., Daniel, M. (2025).
+Kratochv?l, V., Jirou?ek, R., Daniel, M. (2025).
 Learning Belief Functions from Data via Polyhedral Methods.
 Kybernetika.
 ```
