@@ -1,7 +1,7 @@
 Learning Belief Functions from Data: Experimental Supplement
 ================
 Václav Kratochvíl, Radim Jiroušek, Milan Daniel
-prosinec 15, 2025
+prosinec 16, 2025
 
 - [Introduction](#introduction)
 - [Jeffreys Lower Bounds](#jeffreys-lower-bounds)
@@ -71,7 +71,6 @@ UAP and LP-based upper approximation methods.
 # Required packages
 library(lpSolve)
 library(knitr)
-
 
 # ===========================
 # Auxiliary functions
