@@ -78,7 +78,9 @@ also available via Binder:
 
 The Binder link opens RStudio with the main manuscript file
 (`Kybernetika.Rmd`) preloaded. The results can be reproduced by clicking
-*Knit* or by running individual code chunks interactively. —
+*Knit* or by running individual code chunks interactively.
+
+------------------------------------------------------------------------
 
 # Reproducibility
 
