@@ -46,10 +46,14 @@ All computations are deterministic; no stochastic components are used.
 
 # How to Run
 
-You can use one of the following two options. \## Locally using
-RStudio 1. Open the project in **RStudio**. 2. Open the main
-supplementary `.Rmd` file. 3. Click **Knit** (HTML or PDF), or run the
-document using `rmarkdown::render()`.
+You can use one of the following two options.
+
+## Local execution using RStudio
+
+1.  Open the project in **RStudio**.
+2.  Open the main supplementary `.Rmd` file.
+3.  Click **Knit** (HTML or PDF), or run the document using
+    `rmarkdown::render()`.
 
 ``` r
 rmarkdown::render("Kybernetika.Rmd")
