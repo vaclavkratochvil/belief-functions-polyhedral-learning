@@ -1,4 +1,4 @@
-Learning Belief Functions from Data via Polyhedral Methods ?
+Learning Belief Functions from Data via Polyhedral Methods:
 Computational Supplement
 ================
 
@@ -46,19 +46,35 @@ All computations are deterministic; no stochastic components are used.
 
 # How to Run
 
-1.  Open the project in **RStudio**.
-2.  Open the main supplementary `.Rmd` file.
-3.  Click **Knit** (HTML or PDF), or run:
-
-Alternatively, individual code blocks can be copied and executed
-directly in R. Users may provide their own input data or organize the
-code into custom test cases depending on their experimental needs.
+You can use one of the following two options. \## Locally using
+RStudio 1. Open the project in **RStudio**. 2. Open the main
+supplementary `.Rmd` file. 3. Click **Knit** (HTML or PDF), or run the
+document using `rmarkdown::render()`.
 
 ``` r
 rmarkdown::render("Kybernetika.Rmd")
 ```
 
 The compiled output will be generated automatically.
+
+Alternatively, individual code chunks can be executed interactively.
+This allows users to: - run selected parts of the analysis step by
+step, - modify input values or confidence levels, - organize the code
+into custom test scenarios.
+
+Each code chunk is self-contained and can be evaluated independently in
+RStudio using the *Run Current Chunk* or *Run All Chunks* options.
+
+## Binder
+
+An interactive **RStudio environment** for reproducing the results is
+also available via Binder:
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/vaclavkratochvil/belief-functions-polyhedral-learning/main?urlpath=rstudio&filepath=Kybernetika.Rmd)
+
+The Binder link opens RStudio with the main manuscript file
+(`Kybernetika.Rmd`) preloaded. Reviewers can reproduce the results by
+clicking *Knit* or by running individual code chunks interactively.
 
 ------------------------------------------------------------------------
 
