@@ -19,7 +19,7 @@ of the numerical examples and optimization procedures presented in the paper.
 
 The repository includes:
 
-- **R Markdown (`.Rmd`) file** [Kybernetika.Rmd](https://github.com/vaclavkratochvil/belief-functions-polyhedral-learning/blob/main/Kybernetika.md) implementing:
+- **R Markdown (`.Rmd`) file** [analysis.Rmd](https://github.com/vaclavkratochvil/belief-functions-polyhedral-learning/blob/main/analysis.Rmd) (compiled into user frilendly [analysis.md](https://github.com/vaclavkratochvil/belief-functions-polyhedral-learning/blob/main/analysis.md) implementing:
   - computation of Jeffreys confidence interval lower bounds,
   - construction of pseudo-belief functions from data,
   - upper approximation of pseudo-belief functions by belief functions,
@@ -48,12 +48,12 @@ All computations are deterministic; no stochastic components are used.
 You can use one of the following two options.
 
 ## Local execution using RStudio
-1. Open the project in **RStudio**.
-2. Download and open the main supplementary `.Rmd` file.
+1. Open **RStudio**.
+2. Download and open the main supplementary `analysis.Rmd` file.
 3. Click **Knit** (HTML or PDF), or run the document using `rmarkdown::render()`.
 
 ```r
-rmarkdown::render("Kybernetika.Rmd")
+rmarkdown::render("analysis.Rmd")
 ```
 
 The compiled output will be generated automatically.
@@ -72,10 +72,10 @@ Each code chunk is self-contained and can be evaluated independently in RStudio 
 An interactive **RStudio environment** for reproducing the results is also available via Binder:
 
 [![Binder](https://mybinder.org/badge_logo.svg)](
-https://mybinder.org/v2/gh/vaclavkratochvil/belief-functions-polyhedral-learning/main?urlpath=rstudio&filepath=Kybernetika.Rmd
+https://mybinder.org/v2/gh/vaclavkratochvil/belief-functions-polyhedral-learning/main?urlpath=rstudio&filepath=analysis.Rmd
 )
 
-The Binder link opens RStudio with the main manuscript file (`Kybernetika.Rmd`) preloaded. The results can be reproduced by clicking *Knit* or by running individual code chunks interactively.
+The Binder link opens RStudio with the main manuscript file (`analysis.Rmd`) preloaded. The results can be reproduced by clicking *Knit* or by running individual code chunks interactively.
 
 
 ---
