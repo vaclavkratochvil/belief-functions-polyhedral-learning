@@ -22,7 +22,7 @@ The repository includes:
 - **R Markdown (`.Rmd`) file**
   [analysis.Rmd](https://github.com/vaclavkratochvil/belief-functions-polyhedral-learning/blob/main/analysis.Rmd)
   (compiled into user frilendly
-  [analysis.md](https://github.com/vaclavkratochvil/belief-functions-polyhedral-learning/blob/main/analysis.md)
+  [analysis.md](https://github.com/vaclavkratochvil/belief-functions-polyhedral-learning/blob/main/analysis.md))
   implementing:
   - computation of Jeffreys confidence interval lower bounds,
   - construction of pseudo-belief functions from data,
