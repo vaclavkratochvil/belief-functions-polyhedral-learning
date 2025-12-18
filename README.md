@@ -1,5 +1,4 @@
-Learning Belief Functions from Data via Polyhedral Methods:
-Computational Supplement
+From Confidence Bounds to Belief Functions: Computational Supplement
 ================
 
 # Overview
