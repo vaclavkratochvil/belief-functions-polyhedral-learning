@@ -8,7 +8,7 @@ output: github_document
 This repository contains supplementary materials accompanying the paper
 
 **M. Daniel, R. Jiroušek, V. Kratochvíl**  
-*On Learning Belief Functions from Data Using Confidence Bounds*
+*From Confidence Bounds to Belief Functions*, submitted to Kybernetika Journal, December 2025. [https://www.kybernetika.cz/](https://www.kybernetika.cz/)
 
 The goal of this repository is to ensure **computational transparency and reproducibility**
 of the numerical examples and optimization procedures presented in the paper.
@@ -19,12 +19,12 @@ of the numerical examples and optimization procedures presented in the paper.
 
 The repository includes:
 
-- **R Markdown (`.Rmd`) file** [Kybernetika manuscript](https://github.com/vaclavkratochvil/belief-functions-polyhedral-learning/blob/main/Kybernetika.md) implementing:
+- **R Markdown (`.Rmd`) file** [Kybernetika.Rmd](https://github.com/vaclavkratochvil/belief-functions-polyhedral-learning/blob/main/Kybernetika.md) implementing:
   - computation of Jeffreys confidence interval lower bounds,
   - construction of pseudo-belief functions from data,
   - upper approximation of pseudo-belief functions by belief functions,
   - linear programming formulations for selecting representative belief functions.
-- Compiled **HTML/PDF outputs** corresponding to the supplementary material.
+- Compiled **HTML outputs** corresponding to the supplementary material.
 
 ---
 
@@ -36,7 +36,8 @@ Main technologies:
 - **R (version ≥ 4.2)**
 - **R Markdown**
 - Base R statistical functions (`qbeta`)
-- Linear programming solvers (e.g. `lpSolve`)
+- Linear programming solver (`lpSolve`)
+- Tools supporting polyhedral geometry computations (`rcdd`)
 
 All computations are deterministic; no stochastic components are used.
 
@@ -48,8 +49,9 @@ You can use one of the following two options.
 
 ## Local execution using RStudio
 1. Open the project in **RStudio**.
-2. Open the main supplementary `.Rmd` file.
+2. Download and open the main supplementary `.Rmd` file.
 3. Click **Knit** (HTML or PDF), or run the document using `rmarkdown::render()`.
+
 ```r
 rmarkdown::render("Kybernetika.Rmd")
 ```
@@ -62,8 +64,8 @@ This allows users to:
 - modify input values or confidence levels,
 - organize the code into custom test scenarios.
 
-Each code chunk is self-contained and can be evaluated independently in RStudio
-using the *Run Current Chunk* or *Run All Chunks* options.
+Each code chunk is self-contained and can be evaluated independently in RStudio using the *Run Current Chunk* or *Run All Chunks* options. Note, however, that some chunks rely on helper functions defined earlier in the document and may therefore require prior evaluation of those chunks.
+
 
 ## Binder
 
@@ -73,21 +75,17 @@ An interactive **RStudio environment** for reproducing the results is also avail
 https://mybinder.org/v2/gh/vaclavkratochvil/belief-functions-polyhedral-learning/main?urlpath=rstudio&filepath=Kybernetika.Rmd
 )
 
-The Binder link opens RStudio with the main manuscript file (`Kybernetika.Rmd`)
-preloaded. The results can be reproduced by clicking *Knit* or by running
-individual code chunks interactively.
+The Binder link opens RStudio with the main manuscript file (`Kybernetika.Rmd`) preloaded. The results can be reproduced by clicking *Knit* or by running individual code chunks interactively.
 
 
 ---
 
 # Reproducibility
 
-All numerical results reported in the paper can be reproduced by running the provided
-R Markdown files without any manual intervention.
+All numerical results reported in the paper can be reproduced by running the provided R Markdown files without any manual intervention.
 
 ---
 
 # License and Usage
 
-The code is provided for **research and academic use**.
-If you use or adapt this material, please cite the associated paper.
+The code is provided for **research and academic use**. If you use or adapt this material, please cite the associated paper.

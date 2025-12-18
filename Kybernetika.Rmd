@@ -1,5 +1,5 @@
 ---
-title: 'Learning Belief Functions from Data: Experimental Supplement'
+title: 'From Confidence Bounds to Belief Functions: Experimental Supplement'
 author: "Václav Kratochvíl, Radim Jiroušek, Milan Daniel"
 date: "`r format(Sys.Date(), '%B %d, %Y')`"
 output:
@@ -15,7 +15,7 @@ output:
 # Introduction
 
 This notebook provides a compact computational companion to the paper  
-**“Learning Belief Functions from Data via Polyhedral Methods” (Kybernetika, 2025)**.
+**“From Confidence Bounds to Belief Functions”, submited to Kybernetika Journal, December 2025. [https://www.kybernetika.cz/](https://www.kybernetika.cz/)**.
 
 
 Its purpose is to **reproduce and document

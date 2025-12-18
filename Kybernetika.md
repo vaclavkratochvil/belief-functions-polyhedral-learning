@@ -1,7 +1,7 @@
-Learning Belief Functions from Data: Experimental Supplement
+From Confidence Bounds to Belief Functions: Experimental Supplement
 ================
 Václav Kratochvíl, Radim Jiroušek, Milan Daniel
-prosinec 16, 2025
+prosinec 18, 2025
 
 - [Introduction](#introduction)
 - [Jeffreys Lower Bounds](#jeffreys-lower-bounds)
@@ -36,8 +36,8 @@ prosinec 16, 2025
 # Introduction
 
 This notebook provides a compact computational companion to the paper  
-**“Learning Belief Functions from Data via Polyhedral Methods”
-(Kybernetika, 2025)**.
+**“From Confidence Bounds to Belief Functions”, submited to Kybernetika
+Journal, December 2025. <https://www.kybernetika.cz/>**.
 
 Its purpose is to **reproduce and document all worked examples from the
 paper**:

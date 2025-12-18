@@ -7,7 +7,8 @@ Computational Supplement
 This repository contains supplementary materials accompanying the paper
 
 **M. Daniel, R. Jiroušek, V. Kratochvíl**  
-*On Learning Belief Functions from Data Using Confidence Bounds*
+*From Confidence Bounds to Belief Functions*, submitted to Kybernetika
+Journal, December 2025. <https://www.kybernetika.cz/>
 
 The goal of this repository is to ensure **computational transparency
 and reproducibility** of the numerical examples and optimization
@@ -19,16 +20,15 @@ procedures presented in the paper.
 
 The repository includes:
 
-- **R Markdown (`.Rmd`) file** [Kybernetika
-  manuscript](https://github.com/vaclavkratochvil/belief-functions-polyhedral-learning/blob/main/Kybernetika.md)
+- **R Markdown (`.Rmd`) file**
+  [Kybernetika.Rmd](https://github.com/vaclavkratochvil/belief-functions-polyhedral-learning/blob/main/Kybernetika.md)
   implementing:
   - computation of Jeffreys confidence interval lower bounds,
   - construction of pseudo-belief functions from data,
   - upper approximation of pseudo-belief functions by belief functions,
   - linear programming formulations for selecting representative belief
     functions.
-- Compiled **HTML/PDF outputs** corresponding to the supplementary
-  material.
+- Compiled **HTML outputs** corresponding to the supplementary material.
 
 ------------------------------------------------------------------------
 
@@ -37,8 +37,8 @@ The repository includes:
 All computations are implemented in **R** using standard libraries.
 
 Main technologies: - **R (version ≥ 4.2)** - **R Markdown** - Base R
-statistical functions (`qbeta`) - Linear programming solvers
-(e.g. `lpSolve`)
+statistical functions (`qbeta`) - Linear programming solver
+(`lpSolve`) - Tools supporting polyhedral geometry computations (`rcdd`)
 
 All computations are deterministic; no stochastic components are used.
 
@@ -51,7 +51,7 @@ You can use one of the following two options.
 ## Local execution using RStudio
 
 1.  Open the project in **RStudio**.
-2.  Open the main supplementary `.Rmd` file.
+2.  Download and open the main supplementary `.Rmd` file.
 3.  Click **Knit** (HTML or PDF), or run the document using
     `rmarkdown::render()`.
 
@@ -67,7 +67,9 @@ step, - modify input values or confidence levels, - organize the code
 into custom test scenarios.
 
 Each code chunk is self-contained and can be evaluated independently in
-RStudio using the *Run Current Chunk* or *Run All Chunks* options.
+RStudio using the *Run Current Chunk* or *Run All Chunks* options. Note,
+however, that some chunks rely on helper functions defined earlier in
+the document and may therefore require prior evaluation of those chunks.
 
 ## Binder
 
