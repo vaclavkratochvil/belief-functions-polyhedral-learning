@@ -75,6 +75,25 @@ subset_name <- function(S) {
   paste0("{", paste(S, collapse=","), "}")
 }
 
+mobius_transform <- function(subsets, g_values) {
+  k <- length(subsets)
+  m_g <- numeric(k)
+  
+  for (i in seq_len(k)) {
+    A <- subsets[[i]]
+    
+    idx <- sapply(subsets, function(B)
+      all(B %in% A))
+    
+    signs <- sapply(subsets[idx], function(B)
+      (-1)^(length(A) - length(B)))
+    
+    m_g[i] <- sum(signs * g_values[idx])
+  }
+  
+  m_g
+}
+
 ```
 
 
@@ -323,83 +342,83 @@ upper_approximation <- function(Omega, g_values) {
   subsets <- subsets[order(sapply(subsets, length))]
   subset_names <- sapply(subsets, subset_name)
   
-  # 2) If g_values have names -> reorder; if not -> assume correct order
+  # 2) Reorder / name g_values
   if (!is.null(names(g_values))) {
     g_values <- g_values[subset_names]
   } else {
     names(g_values) <- subset_names
   }
   
-  
-  # 3) Enforce normalization: g(Omega) = 1
-  # Find index of \Omega = full set
+  # 3) Enforce normalization
   full_idx <- which(subset_names == subset_name(Omega))
   g_values[full_idx] <- 1
   
+  # 4) Compute m_g BEFORE UAP
+  m_g <- mobius_transform(subsets, g_values)
+  
   k <- length(subsets)
   f <- numeric(k)
-  m <- numeric(k)
+  m_f <- numeric(k)
   
-  # 4) Main UAP loop (exact definition from article)
+  # 5) Main UAP loop
   for (i in seq_len(k)) {
     A <- subsets[[i]]
     
-    # proper subsets of A
     idx <- sapply(subsets, function(B)
       length(B) < length(A) && all(B %in% A))
     
-    sum_prev <- sum(m[idx])
+    sum_prev <- sum(m_f[idx])
     
-    # f(A)
-    f[i] <- max(g_values[i], sum_prev)
-    
-    # m(A)
-    m[i] <- f[i] - sum_prev
+    f[i]   <- max(g_values[i], sum_prev)
+    m_f[i] <- f[i] - sum_prev
   }
   
-  # 5) Check failure condition
+  # 6) Failure check
   if (f[k] > 1 + 1e-12) {
     return(list(
       success = FALSE,
       message = "UAP failed: f(Omega) > 1",
       subsets = subset_names,
+      g = g_values,
+      m_g = m_g,
       f = f,
-      m = m
+      m_f = m_f
     ))
   }
-  
-  # IMPORTANT:
-  # f(Omega) is NOT overwritten.
-  # m(Omega) stays as computed.
   
   list(
     success = TRUE,
     subsets = subset_names,
+    g = g_values,
+    m_g = m_g,
     f = f,
-    m = m
+    m_f = m_f
   )
 }
+
 
 
 # ============================================
 # Helper: Print UAP table exactly like in paper
 # ============================================
 
-uap_table <- function(result, g_values) {
+uap_table <- function(result) {
   df <- data.frame(
-    A       = result$subsets,
-    g       = g_values,
-    sum_prev = round(result$f - result$m, 6),
-    f       = round(result$f, 6),
-    m_f     = round(result$m, 6),
+    A        = result$subsets,
+    g        = round(result$g, 6),
+    m_g      = round(result$m_g, 6),
+    sum_prev = round(result$f - result$m_f, 6),
+    f        = round(result$f, 6),
+    m_f      = round(result$m_f, 6),
     row.names = NULL
   )
   
-  # remove the first row (empty set)
+  # remove empty set
   df <- df[-1, ]
   
   df
 }
+
 ```
 
 ## Table 1 (ternary, original \(g\))
@@ -416,7 +435,7 @@ g_ternary <- c(
 res <- upper_approximation(Omega3, g_ternary)
 res$success  # expected: FALSE (as in Table 1)
 
-table <- uap_table(res, g_ternary)
+table <- uap_table(res)
 
 # print table
 knitr::kable(
@@ -442,7 +461,7 @@ g_ternary_tilde <- c(
 res_tilde <- upper_approximation(Omega3, g_ternary_tilde)
 res_tilde$success  # expected: TRUE
 
-table <- uap_table(res_tilde, g_ternary_tilde)
+table <- uap_table(res_tilde)
 
 # print table
 knitr::kable(
@@ -503,7 +522,7 @@ res4 <- upper_approximation(Omega4, g4_vals)
 res4$success
 
 # Construct table
-tab4 <- uap_table(res4, g4_vals)
+tab4 <- uap_table(res4)
 
 # print table
 knitr::kable(
@@ -546,7 +565,7 @@ res5 <- upper_approximation(Omega4, g5_vals)
 res5$success
 
 # Construct table
-tab5 <- uap_table(res5, g5_vals)
+tab5 <- uap_table(res5)
 
 # Print table
 
@@ -602,7 +621,7 @@ res6 <- upper_approximation(Omega4, g6_vals)
 res6$success
 
 # Construct table
-tab6 <- uap_table(res6, g6_vals)
+tab6 <- uap_table(res6)
 
 # print table
 knitr::kable(
@@ -953,7 +972,7 @@ compute_table <- function(Omega, g_values) {
   table_body <- data.frame(
     subset = subset_names,
     g      = g_values,
-    
+    # m_g    = uap$m_g,
     f_L1   = sol_L1$f,
     f_HD   = sol_HD$f,
     f_CW   = sol_CW$f,
@@ -962,7 +981,7 @@ compute_table <- function(Omega, g_values) {
     m_L1   = sol_L1$m,
     m_HD   = sol_HD$m,
     m_CW   = sol_CW$m,
-    m_UAP  = uap$m,
+    m_UAP  = uap$m_f,
     
     row.names = NULL
   )
