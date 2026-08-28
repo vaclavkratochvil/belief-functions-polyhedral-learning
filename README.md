@@ -3,96 +3,75 @@ From Confidence Bounds to Belief Functions: Computational Supplement
 
 # Overview
 
-This repository contains supplementary materials accompanying the paper
+The supplement is a self-contained, step-by-step R analysis accompanying
+*From Confidence Bounds to Belief Functions* (M. Daniel, R. Jiroušek and
+V. Kratochvíl).
 
-**M. Daniel, R. Jiroušek, V. Kratochvíl**  
-*From Confidence Bounds to Belief Functions*, submitted to Kybernetika
-Journal, December 2025. <https://www.kybernetika.cz/>
+- **analysis.Rmd**: explanation and executable R code in one document.
+- **analysis.R**: the same analysis as an ordinary R script, with the
+  explanation retained as comments.
+- **analysis.md**: rendered version for reading.
 
-The goal of this repository is to ensure **computational transparency
-and reproducibility** of the numerical examples and optimization
-procedures presented in the paper.
+The analysis needs no additional scripts or input data files.
+Worked-example inputs and recorded benchmark summaries are included in
+the document.
 
-------------------------------------------------------------------------
+# Run the analysis
 
-# Content
-
-The repository includes:
-
-- **R Markdown (`.Rmd`) file**
-  [analysis.Rmd](https://github.com/vaclavkratochvil/belief-functions-polyhedral-learning/blob/main/analysis.Rmd)
-  (compiled into user frilendly
-  [analysis.md](https://github.com/vaclavkratochvil/belief-functions-polyhedral-learning/blob/main/analysis.md))
-  implementing:
-  - computation of Jeffreys confidence interval lower bounds,
-  - construction of pseudo-belief functions from data,
-  - upper approximation of pseudo-belief functions by belief functions,
-  - linear programming formulations for selecting representative belief
-    functions.
-- Compiled **HTML outputs** corresponding to the supplementary material.
-
-------------------------------------------------------------------------
-
-# Implementation
-
-All computations are implemented in **R** using standard libraries.
-
-Main technologies: - **R (version ≥ 4.2)** - **R Markdown** - Base R
-statistical functions (`qbeta`) - Linear programming solver
-(`lpSolve`) - Tools supporting polyhedral geometry computations (`rcdd`)
-
-All computations are deterministic; no stochastic components are used.
-
-------------------------------------------------------------------------
-
-# How to Run
-
-You can use one of the following two options.
-
-## Local execution using RStudio
-
-1.  Open **RStudio**.
-2.  Download and open the main supplementary `analysis.Rmd` file.
-3.  Click **Knit** (HTML or PDF), or run the document using
-    `rmarkdown::render()`.
+Install the packages used by the worked examples:
 
 ``` r
-rmarkdown::render("analysis.Rmd")
+install.packages(c("lpSolve", "rcdd", "knitr"))
+source("analysis.R")
 ```
 
-The compiled output will be generated automatically.
+Alternatively, open analysis.Rmd in RStudio and Knit it. Rendering also
+requires rmarkdown and Pandoc. By default, the worked examples are
+calculated and the included benchmark summaries are displayed.
 
-Alternatively, individual code chunks can be executed interactively.
-This allows users to: - run selected parts of the analysis step by
-step, - modify input values or confidence levels, - organize the code
-into custom test scenarios.
+To repeat the time and memory measurements:
 
-Each code chunk is self-contained and can be evaluated independently in
-RStudio using the *Run Current Chunk* or *Run All Chunks* options. Note,
-however, that some chunks rely on helper functions defined earlier in
-the document and may therefore require prior evaluation of those chunks.
+``` r
+install.packages(c("highs", "Matrix", "callr", "ps"))
+options(bf.run_benchmarks = TRUE)
+source("analysis.R")
+options(bf.run_benchmarks = FALSE)
+```
 
-## Binder
+The same option works when knitting the Rmd. All calculation and summary
+functions are defined in the analysis itself. For a quick trial, after
+loading the script use run_instance(5) or benchmark_frames(5:6,
+repetitions = 2).
 
-An interactive **RStudio environment** for reproducing the results is
-also available via Binder:
+# What is measured
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/vaclavkratochvil/belief-functions-polyhedral-learning/main?urlpath=rstudio&filepath=analysis.Rmd)
+The supplement covers Jeffreys lower bounds, UAP, the polyhedral
+formulation, the three LP criteria, and vertex enumeration for the small
+examples. The resource study uses five repetitions per small-example
+task, 20 random inputs per frame size 5–10, and one exploratory input
+for 11–15 and 20.
 
-The Binder link opens RStudio with the main manuscript file
-(`analysis.Rmd`) preloaded. The results can be reproduced by clicking
-*Knit* or by running individual code chunks interactively.
+Each measurement runs in a fresh R process. Peak process memory includes
+native solver allocations. Matrix-size, time and memory guards stop
+overly large calculations; a guarded run is not a proof of
+infeasibility. Seeds and RNG settings fix the inputs. Times, memory and
+the choice between alternative optimal solutions can depend on the
+environment and solver version.
 
-------------------------------------------------------------------------
+# Maintenance
 
-# Reproducibility
+These utilities are optional and are not dependencies of the analysis:
 
-All numerical results reported in the paper can be reproduced by running
-the provided R Markdown files without any manual intervention.
+- run_r_experiments.R –check: consistency and guard tests.
+- run_r_experiments.R –extract: regenerate analysis.R from the Rmd.
+- run_r_experiments.R –render: regenerate analysis.md.
+- run_r_experiments.R –run: rerun the benchmarks and save raw results in
+  r_experiment_results after the complete run.
+- check_self_contained.R: test execution from an empty working
+  directory.
+- update_article_tables.R: regenerate the red manuscript TeX tables from
+  the saved raw measurements using the analysis’s summary functions.
 
-------------------------------------------------------------------------
+# Usage
 
-# License and Usage
-
-The code is provided for **research and academic use**. If you use or
-adapt this material, please cite the associated paper.
+If you use or adapt this material, please cite the associated paper.
