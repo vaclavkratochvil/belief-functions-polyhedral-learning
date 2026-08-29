@@ -1,7 +1,7 @@
 From Confidence Bounds to Belief Functions: Experimental Supplement
 ================
 Václav Kratochvíl, Radim Jiroušek, Milan Daniel
-August 28, 2026
+srpen 29, 2026
 
 - [Introduction](#introduction)
 - [Jeffreys Lower Bounds](#jeffreys-lower-bounds)
@@ -32,20 +32,10 @@ August 28, 2026
     - [Table 8](#table-8)
     - [Table 9](#table-9)
     - [Table 10](#table-10)
-- [Larger frames and computational
-  cost](#larger-frames-and-computational-cost)
-  - [1. Generate a random input](#1-generate-a-random-input)
-  - [2. Keep only the necessary
-    constraints](#2-keep-only-the-necessary-constraints)
-  - [3. Solve and check all three
-    criteria](#3-solve-and-check-all-three-criteria)
-  - [4. Measure time and memory](#4-measure-time-and-memory)
-  - [5. Repeat the experiment](#5-repeat-the-experiment)
-  - [6. Display the results](#6-display-the-results)
-    - [Small examples](#small-examples)
-    - [Twenty random inputs per frame
-      size](#twenty-random-inputs-per-frame-size)
-    - [Exploratory larger frames](#exploratory-larger-frames)
+- [Scaling experiment](#scaling-experiment)
+  - [Generate one data set](#generate-one-data-set)
+  - [Run the experiment](#run-the-experiment)
+  - [Summarize the results](#summarize-the-results)
 
 # Introduction
 
@@ -166,9 +156,9 @@ condition $g(\Omega) = 1 ,$ which ensures that the resulting set
 function behaves as a *pseudo-belief function* compatible with the
 dominance relation used later in the Upper Approximation Procedure.
 
-All computations of $g(A)$ in this notebook use the function
-`jeffreys_pseudo_belief_function()` defined below, which implements the
-mapping $\{n_B\} \mapsto g(\cdot)$ exactly as described above.
+The worked examples use `jeffreys_pseudo_belief_function()` below. The
+scaling experiment uses the same `jeffreys_interval()` calculation, with
+a subset-sum transform to aggregate counts efficiently.
 
 For convenience, we include the empty set $\emptyset$ in the internal
 representation (with $g(\emptyset)=0$, but we omit it from the printed
@@ -496,8 +486,8 @@ knitr::kable(
 | {w2,w3}    | 0.7 |  0.4 |      0.3 | 0.7 | 0.4 |
 | {w1,w2,w3} | 1.0 | -0.2 |      1.2 | 1.2 | 0.0 |
 
-Table 1 \<U+2014\> Upper Approximation for the original pseudo-belief
-function g on a ternary frame.
+Table 1 — Upper Approximation for the original pseudo-belief function g
+on a ternary frame.
 
 For the original pseudo-belief function $g$, the UAP fails because the
 lower bounds on several subsets jointly force the final value
@@ -541,8 +531,7 @@ knitr::kable(
 | {w2,w3}    | 0.7 |  0.2 |      0.5 | 0.7 | 0.2 |
 | {w1,w2,w3} | 1.0 |  0.1 |      1.0 | 1.0 | 0.0 |
 
-Table 1 (modified) \<U+2014\> UAP succeeds for the adjusted
-pseudo-belief.
+Table 1 (modified) — UAP succeeds for the adjusted pseudo-belief.
 
 The modified function $\tilde{g}$, which only increases singleton
 values, removes this conflict: the accumulated mass from proper subsets
@@ -633,8 +622,7 @@ knitr::kable(
 | {w2,w3,w4}    | 0.600113 | -0.031578 | 0.631691 | 0.631691 | 0.000000 |
 | {w1,w2,w3,w4} | 1.000000 |  0.116902 | 1.009241 | 1.009241 | 0.000000 |
 
-Table 4 \<U+2014\> UAP failure for Jeffreys lower bounds with alpha =
-0.05.
+Table 4 — UAP failure for Jeffreys lower bounds with alpha = 0.05.
 
 ### Table 5 — Jeffreys lower bounds with $\alpha = 0.02$
 
@@ -701,8 +689,7 @@ knitr::kable(
 | {w2,w3,w4}    | 0.574583 | -0.033421 | 0.608005 | 0.608005 | 0.000000 |
 | {w1,w2,w3,w4} | 1.000000 |  0.139214 | 0.994141 | 1.000000 | 0.005859 |
 
-Table 5 \<U+2014\> UAP succeeds for Jeffreys lower bounds with alpha =
-0.02.
+Table 5 — UAP succeeds for Jeffreys lower bounds with alpha = 0.02.
 
 ### Table 6 — Discounted pseudo-belief function ($\delta = 0.02$)
 
@@ -781,8 +768,7 @@ knitr::kable(
 | {w2,w3,w4}    | 0.588110 | -0.030947 | 0.619057 | 0.619057 | 0.000000 |
 | {w1,w2,w3,w4} | 1.000000 |  0.134564 | 0.989056 | 1.000000 | 0.010944 |
 
-Table 6 \<U+2014\> UAP succeeds after Shafer discounting with delta =
-0.02.
+Table 6 — UAP succeeds after Shafer discounting with delta = 0.02.
 
 # Polyhedral Representation of the Upper Approximation
 
@@ -1515,731 +1501,261 @@ knitr::kable(
 | Ternary modified g_tilde |      27      |   4 |   4 |   4 |
 | Quaternary example       |    13889     |   1 |   1 |  14 |
 
-Table 10 \<U+2014\> Counts of extreme points and numbers achieving
-minimum value under each objective.
+Table 10 — Counts of extreme points and numbers achieving minimum value
+under each objective.
 
-# Larger frames and computational cost
+# Scaling experiment
 
-We now repeat the same calculation on randomly generated data. The steps
-are unchanged: obtain Jeffreys lower bounds, construct a dominating
-belief function, and compare L1, HD and CW. We reuse the functions
-already introduced: the interval calculation, the three objective
-functions, and the small-example routines for LP/UAP and vertex
-enumeration.
+Direct LP calculations for the examples with $|\Omega|=3,4$ are very
+fast. We therefore use generated data to see how the sparse LP
+formulation behaves for $|\Omega|=5,\ldots,13$. This is an illustration,
+not a general benchmark.
 
-For educational clarity, the small-frame examples use a straightforward
-dense-matrix formulation with the R package `lpSolve`. For larger
-frames, we use HiGHS, an open-source optimization solver accessed
-through the R package `highs`, which supports large sparse constraint
-matrices. The data provide a lower bound for each subset of the frame,
-so the number of potential dominance constraints grows exponentially
-with the frame size. Their coefficients are nonzero only when one subset
-is contained in another, making sparse storage particularly useful here.
+All scaling calculations use HiGHS. The constraint
+$\sum_{B\subseteq A}m(B)\geq g(A)$ has a zero coefficient whenever
+$B\not\subseteq A$. Its full matrix has $3^{|\Omega|}$ nonzeros among
+$4^{|\Omega|}$ entries, so sparse storage is useful.
 
-We therefore remove redundant constraints, represent subsets by integer
-bit masks, and store only the nonzero matrix entries. This changes the
-implementation, not the optimization problem or the three criteria.
+## Generate one data set
 
-## 1. Generate a random input
+For each data set, choose $k$ uniformly from $1,\ldots,|\Omega|$ and
+sample $k$ distinct nonsingleton subsets. Together with all singletons,
+these are the observed subsets. Give each one observation first.
+Distribute the remaining $200-(|\Omega|+k)$ observations multinomially
+using normalized Gamma$(1,1)$ weights. Consequently every selected
+subset has a positive count.
 
-For a frame of size n, choose all n singletons and n random nonsingleton
-focal sets. Assign normalized Gamma(1,1) masses and draw 200
-observations. The counts determine the Jeffreys bounds at alpha = 0.05;
-as before, the empty-set and full-frame bounds are fixed to 0 and 1.
-
-The following helper computes all subset sums without building a matrix.
-The same helper will later reconstruct belief values from a mass vector.
-The random seed fixes the generated input.
+The two short helpers below compute subset sums and construct the sparse
+constraint matrix. Subsets are represented by integer bit masks.
 
 ``` r
-bf_cardinality <- function(n) {
+subset_cardinalities <- function(n) {
   card <- 0L
-  for (bit in seq_len(n)) card <- c(card, card + 1L)
+  for (i in seq_len(n)) card <- c(card, card + 1L)
   card
 }
 
-bf_zeta <- function(x, n) {
-  for (bit in 0:(n - 1L)) {
-    step <- 2^bit
-    blocks <- matrix(x, nrow = 2L * step)
-    blocks[(step + 1L):(2L * step), ] <-
-      blocks[(step + 1L):(2L * step), , drop = FALSE] +
-      blocks[seq_len(step), , drop = FALSE]
-    x <- as.vector(blocks)
+subset_sums <- function(x, n) {
+  for (i in 0:(n - 1L)) {
+    step <- 2^i
+    z <- matrix(x, nrow = 2L * step)
+    z[(step + 1L):(2L * step), ] <-
+      z[(step + 1L):(2L * step), , drop = FALSE] +
+      z[seq_len(step), , drop = FALSE]
+    x <- as.vector(z)
   }
   x
 }
 
-bf_generate <- function(n, seed, N = 200L, alpha = 0.05) {
-  RNGkind("Mersenne-Twister", "Inversion", "Rejection")
+generate_data <- function(n, seed, N = 200L) {
   set.seed(seed)
-  card <- bf_cardinality(n)
-  selected <- c(as.integer(2^(0:(n - 1L))),
-                sample(which(card >= 2L) - 1L, n, replace = FALSE))
-  probability <- rgamma(2L * n, shape = 1)
-  probability <- probability / sum(probability)
+  card <- subset_cardinalities(n)
+  k <- sample.int(n, 1L)
+  selected <- c(2^(0:(n - 1L)),
+                sample(which(card >= 2L) - 1L, k))
+  weights <- rgamma(n + k, shape = 1)
+  probabilities <- weights / sum(weights)
+
   counts <- integer(2^n)
-  counts[selected + 1L] <- as.vector(rmultinom(1L, N, probability))
-  successes <- bf_zeta(counts, n)
-  lookup <- jeffreys_interval(0:N, N, alpha)$lower
-  g <- lookup[successes + 1L]
-  g[c(1L, length(g))] <- c(0, 1)
-  list(card = card, counts = counts, successes = successes, g = g,
-       selected = selected, probability = probability)
-}
-```
+  counts[selected + 1L] <- 1L +
+    as.vector(rmultinom(1L, N - length(selected), probabilities))
 
-## 2. Keep only the necessary constraints
-
-If a nonempty B is contained in A and both have the same lower bound,
-the constraint for A follows from that for B and monotonicity. It is
-enough to check immediate predecessors. The empty set is excluded from
-this test: a nonempty zero-count singleton has a positive Jeffreys lower
-bound.
-
-The objective weights below come from the same L1, HD and CW functions
-used in the small examples. Only subset cardinalities are needed.
-
-``` r
-bf_keep_rows <- function(successes, n) {
-  masks <- 0:(length(successes) - 1L)
-  keep <- rep(TRUE, length(successes))
-  keep[c(1L, length(keep))] <- FALSE
-  for (bit in 0:(n - 1L)) {
-    b <- as.integer(2^bit)
-    a <- masks[bitwAnd(masks, b) != 0L]
-    predecessor <- bitwXor(a, b)
-    redundant <- predecessor != 0L &
-      successes[a + 1L] == successes[predecessor + 1L]
-    keep[a[redundant] + 1L] <- FALSE
-  }
-  which(keep) - 1L
+  list(k = k, selected = selected, counts = counts, card = card)
 }
 
-bf_sparse_matrix <- function(rows, card, nvars) {
-  loadNamespace("Matrix")
+sparse_subset_matrix <- function(rows, card, n_variables) {
   sizes <- 2^card[rows + 1L]
   offsets <- c(0, cumsum(sizes))
-  indices <- integer(tail(offsets, 1L))
+  columns <- integer(tail(offsets, 1L))
+
   for (i in seq_along(rows)) {
-    bits <- as.integer(2^(which(as.logical(intToBits(rows[i]))) - 1L))
-    submasks <- 0L
-    for (b in bits) submasks <- c(submasks, submasks + b)
-    indices[seq.int(offsets[i] + 1L, offsets[i + 1L])] <- submasks
+    bits <- 2^(which(as.logical(intToBits(rows[i]))) - 1L)
+    subsets <- 0L
+    for (bit in bits) subsets <- c(subsets, subsets + bit)
+    columns[seq.int(offsets[i] + 1L, offsets[i + 1L])] <- subsets
   }
-  row_matrix <- methods::new(
-    "dgRMatrix", Dim = as.integer(c(length(rows), nvars)),
-    p = as.integer(offsets), j = indices, x = rep(1, length(indices)))
-  methods::as(row_matrix, "CsparseMatrix")
-}
 
-bf_objectives <- function(card, n) {
-  criteria <- list(L1 = objective_L1, HD = objective_HD, CW = objective_CW)
-  lapply(criteria, function(criterion) criterion(card, seq_len(n)))
-}
-
-bf_violation <- function(m, g, n) {
-  if (any(!is.finite(m))) return(Inf)
-  max(0, -min(m), abs(m[1L]), abs(sum(m) - 1),
-      max(g - bf_zeta(m, n)))
+  M <- methods::new("dgRMatrix",
+    Dim = as.integer(c(length(rows), n_variables)),
+    p = as.integer(offsets), j = as.integer(columns),
+    x = rep(1, length(columns)))
+  methods::as(M, "CsparseMatrix")
 }
 ```
 
-## 3. Solve and check all three criteria
+## Run the experiment
 
-The next function builds the sparse LP once and calls HiGHS for each
-objective. Each solution is checked against **all** lower bounds,
-including the rows removed above, as well as nonnegativity,
-normalization and zero empty-set mass. We retain times, focal counts and
-the largest constraint violation. A temporary checkpoint allows partial
-results to survive if a large calculation has to be stopped.
+Set `run_scaling_experiment` to TRUE and run this chunk. For each
+$|\Omega|=5,\ldots,10$ there are 20 data sets; for $|\Omega|=11,12,13$
+there are five. Since none of the five calculations for $|\Omega|=13$
+finished within the time limit, larger frames were not attempted.
 
-``` r
-bf_scaling_worker <- function(job, checkpoint) {
-  started <- as.numeric(Sys.time())
-  n <- job$n
-  input <- bf_generate(n, job$seed)
-  rows <- bf_keep_rows(input$successes, n)
-  nnz <- sum(2^input$card[rows + 1L])
-  result <- list(
-    Omega_size = n, repetition = job$repetition, seed = job$seed,
-    variables = 2^n, dominance_constraints = length(rows),
-    dominance_nonzeros = nnz,
-    estimated_matrix_MiB = (12 * nnz + 4 * (2^n + 1)) / 2^20,
-    attempted = FALSE, successful = FALSE, outcome = "preparing",
-    seconds_preparation = NA_real_, seconds_three_LPs = NA_real_,
-    seconds_total = NA_real_, completed_criteria = 0L,
-    seconds_L1 = NA_real_, seconds_HD = NA_real_, seconds_CW = NA_real_,
-    focal_L1 = NA_integer_, focal_HD = NA_integer_, focal_CW = NA_integer_,
-    objective_L1 = NA_real_, objective_HD = NA_real_, objective_CW = NA_real_,
-    n_distinct_solutions = NA_integer_, max_violation = NA_real_, message = "")
-  saveRDS(result, checkpoint)
-  if (nnz > job$max_nonzeros) {
-    result$outcome <- "matrix_limit"
-    result$message <- "Dominance nnz exceeds pre-allocation safety limit"
-    result$seconds_preparation <- as.numeric(Sys.time()) - started
-    result$seconds_total <- result$seconds_preparation
-    return(result)
-  }
-  result$attempted <- TRUE
-  saveRDS(result, checkpoint)
-  tryCatch({
-    dominance <- bf_sparse_matrix(rows, input$card, 2^n)
-    A <- rbind(dominance, Matrix::Matrix(1, nrow = 1L, ncol = 2^n, sparse = TRUE))
-    upper <- rep(Inf, 2^n)
-    upper[1L] <- 0
-    lhs <- c(input$g[rows + 1L], 1)
-    rhs <- c(rep(Inf, length(rows)), 1)
-    objectives <- bf_objectives(input$card, n)
-    result$seconds_preparation <- as.numeric(Sys.time()) - started
-    result$outcome <- "solving"
-    saveRDS(result, checkpoint)
-    solutions <- list()
-    for (criterion in names(objectives)) {
-      tic <- as.numeric(Sys.time())
-      fit <- highs::highs_solve(
-        L = objectives[[criterion]], lower = 0, upper = upper,
-        A = A, lhs = lhs, rhs = rhs,
-        control = highs::highs_control(
-          threads = 1L, time_limit = job$lp_time_limit,
-          primal_feasibility_tolerance = 1e-9,
-          dual_feasibility_tolerance = 1e-9,
-          ipm_optimality_tolerance = 1e-9))
-      result[[paste0("seconds_", criterion)]] <- as.numeric(Sys.time()) - tic
-      if (!identical(fit$status_message, "Optimal"))
-        stop(paste(criterion, fit$status_message))
-      m <- fit$primal_solution
-      solutions[[criterion]] <- m
-      result[[paste0("focal_", criterion)]] <- sum(m > 1e-8)
-      result[[paste0("objective_", criterion)]] <- sum(objectives[[criterion]] * m)
-      violation <- bf_violation(m, input$g, n)
-      result$max_violation <- max(c(result$max_violation, violation), na.rm = TRUE)
-      result$completed_criteria <- length(solutions)
-      saveRDS(result, checkpoint)
-      if (violation > 1e-7) stop("Independent feasibility validation failed")
-    }
-    result$seconds_three_LPs <- sum(unlist(result[paste0("seconds_", names(objectives))]))
-    result$n_distinct_solutions <- nrow(unique(round(t(do.call(cbind, solutions)), 8)))
-    result$successful <- TRUE
-    result$outcome <- "solved"
-  }, error = function(e) {
-    result$outcome <<- if (grepl("bad_alloc|cannot allocate|memory",
-                                conditionMessage(e), ignore.case = TRUE))
-      "allocation_failure" else "solver_failure"
-    result$message <<- conditionMessage(e)
-  })
-  result$seconds_total <- as.numeric(Sys.time()) - started
-  result
-}
-```
+The code follows the calculation in its natural order: generate counts,
+calculate Jeffreys bounds, build the sparse matrix, solve the three LPs,
+and save one result row. Elapsed times are measured with
+`system.time()`. For a simple memory indication, `gc(reset=TRUE)` resets
+R’s memory counter before each data set; the reported value is the
+subsequent increase in maximum memory managed by R. It does not include
+memory allocated internally by HiGHS.
 
-## 4. Measure time and memory
-
-A measurement uses a fresh R process, so memory from earlier
-calculations is not carried over. Solver time covers the three LP calls;
-total computation time also includes preparation and validation. Process
-startup and package loading are excluded from these computation times.
-
-Peak RSS measures resident process memory, including R, loaded packages
-and native solver allocations. It is not the size of the R objects
-alone. On Windows we also record peak committed memory and use the
-operating system’s peak counters. Elsewhere RSS is sampled and is a
-lower bound on the true peak. All memory values are in MiB (2^20 bytes).
-
-For safety, a child is stopped above 1,024 MiB process memory or below
-128 MiB available system memory. Polling every 20 ms can allow a short
-allocation burst to overshoot the threshold. The matrix is not allocated
-above 30 million nonzeros. These are resource guards, not tests of
-mathematical feasibility.
-
-<details>
-<summary>
-Implementation of the measurement helper
-</summary>
-
-This helper is independent of the belief-function calculation. It loads
-only the functions needed by a child process and returns the result with
-memory measurements. It can be read separately from the experiment
-itself.
+There is no process monitor or memory guard. The only fixed check avoids
+allocating a matrix with more than 100 million nonzeros.
 
 ``` r
-bf_memory <- function(handle = ps::ps_handle()) {
-  info <- ps::ps_memory_info(handle)
-  peak <- if ("peak_wset" %in% names(info)) info[["peak_wset"]] else info[["rss"]]
-  committed <- if ("peak_pagefile" %in% names(info)) info[["peak_pagefile"]] else NA_real_
-  current <- if ("mem_private" %in% names(info)) info[["mem_private"]] else info[["rss"]]
-  c(rss = info[["rss"]], peak_rss = peak, peak_commit = committed, guard = current) / 2^20
-}
+run_scaling_experiment <- FALSE
 
-bf_child <- function(job, functions, checkpoint) {
-  e <- list2env(functions, parent = globalenv())
-  for (name in names(functions))
-    if (is.function(e[[name]])) environment(e[[name]]) <- e
-  if (job$kind == "small") {
-    library(lpSolve)
-    library(rcdd)
-  } else {
-    loadNamespace("highs")
-    loadNamespace("Matrix")
-  }
-  gc()
-  baseline <- e$bf_memory()
-  if (job$kind == "small") {
-    tic <- as.numeric(Sys.time())
-    value <- if (job$task == "LP_UAP")
-      e$compute_table(job$Omega, job$g) else
-      e$compute_vertex_minima(job$g, job$Omega)
-    result <- list(example = job$example, task = job$task,
-                   repetition = job$repetition, successful = TRUE,
-                   outcome = "solved",
-                   seconds_total = as.numeric(Sys.time()) - tic)
-    if (job$task == "vertices")
-      stopifnot(value$all_vertices == job$expected_vertices)
-  } else result <- e$bf_scaling_worker(job, checkpoint)
-  result$baseline_RSS_MiB <- unname(baseline["rss"])
-  final <- e$bf_memory()
-  result$peak_RSS_MiB <- unname(final["peak_rss"])
-  result$peak_commit_MiB <- unname(final["peak_commit"])
-  result
-}
-
-bf_measure <- function(job, functions, memory_limit_MiB = 1024,
-                       min_available_MiB = 128, poll_seconds = 0.02) {
-  # Do not serialize the caller's whole notebook environment into the child.
-  # bf_child reconstructs a dedicated environment containing only this bundle.
-  functions <- lapply(functions, function(f) {
-    if (is.function(f)) environment(f) <- baseenv()
-    f
-  })
-  child_entry <- bf_child
-  environment(child_entry) <- baseenv()
-  checkpoint <- tempfile(fileext = ".rds")
-  logs <- c(tempfile(), tempfile())
-  on.exit(unlink(c(checkpoint, logs)), add = TRUE)
-  child <- callr::r_bg(
-    child_entry, args = list(job, functions, checkpoint), libpath = .libPaths(),
-    user_profile = FALSE, system_profile = FALSE, supervise = TRUE,
-    stdout = logs[1], stderr = logs[2])
-  on.exit(if (child$is_alive()) child$kill(), add = TRUE)
-  handle <- ps::ps_handle(child$get_pid())
-  peak_rss <- 0
-  peak_commit <- NA_real_
-  reason <- ""
-  tic <- as.numeric(Sys.time())
-  while (child$is_alive()) {
-    mem <- tryCatch(bf_memory(handle), error = function(e) NULL)
-    if (!is.null(mem)) {
-      peak_rss <- max(peak_rss, mem["peak_rss"])
-      if (is.finite(mem["peak_commit"]))
-        peak_commit <- max(c(peak_commit, mem["peak_commit"]), na.rm = TRUE)
-      available <- ps::ps_system_memory()[["avail"]] / 2^20
-      if (mem["guard"] > memory_limit_MiB || mem["rss"] > memory_limit_MiB)
-        reason <- "process_memory_limit"
-      else if (available < min_available_MiB)
-        reason <- "system_memory_limit"
-    }
-    if (as.numeric(Sys.time()) - tic > job$wall_limit)
-      reason <- "wall_time_limit"
-    if (nzchar(reason)) {
-      child$kill()
-      break
-    }
-    Sys.sleep(poll_seconds)
-  }
-  result <- tryCatch(child$get_result(), error = function(e) {
-    partial <- if (file.exists(checkpoint))
-      tryCatch(readRDS(checkpoint), error = function(e) list()) else list()
-    partial$successful <- FALSE
-    partial$outcome <- if (nzchar(reason)) reason else "process_failure"
-    partial$message <- if (nzchar(reason)) reason else conditionMessage(e)
-    partial
-  })
-  result$peak_RSS_MiB <- max(c(result$peak_RSS_MiB, peak_rss), na.rm = TRUE)
-  result$peak_commit_MiB <- if (all(is.na(c(result$peak_commit_MiB, peak_commit))))
-    NA_real_ else max(c(result$peak_commit_MiB, peak_commit), na.rm = TRUE)
-  if (is.null(result$baseline_RSS_MiB)) result$baseline_RSS_MiB <- NA_real_
-  result$wall_seconds <- as.numeric(Sys.time()) - tic
-  result$memory_limit_MiB <- memory_limit_MiB
-  result$min_available_MiB <- min_available_MiB
-  result$peak_method <- if (.Platform$OS.type == "windows")
-    "OS lifetime peak working set" else "sampled RSS lower bound"
-  result
-}
-
-combine_results <- function(records) {
-  columns <- unique(unlist(lapply(records, names)))
-  result <- do.call(rbind, lapply(records, function(x) {
-    x[setdiff(columns, names(x))] <- NA
-    as.data.frame(x[columns], stringsAsFactors = FALSE)
-  }))
-  result
-}
-```
-
-</details>
-
-With that helper in place, a complete experiment has a short interface.
-The function bundle contains only the definitions already given above.
-
-``` r
-experiment_functions <- function() {
-  mget(c("powerset", "subset_name", "subset_sizes", "mobius_transform",
-    "upper_approximation", "build_lp_constraints", "lp_to_H",
-    "extract_vertices", "enumerate_vertices", "objective_L1", "objective_HD",
-    "objective_CW", "solve_lp_for_objective", "compute_table",
-    "compute_vertex_minima", "jeffreys_interval", "bf_cardinality", "bf_zeta",
-    "bf_generate", "bf_keep_rows", "bf_sparse_matrix", "bf_objectives",
-    "bf_violation", "bf_scaling_worker", "bf_memory"),
-    envir = environment(experiment_functions))
-}
-
-run_instance <- function(n, repetition = 1L,
-                         seed = 20260826L + 1000L * n + repetition,
-                         time_limit = 60) {
-  job <- list(kind = "scaling", n = n, repetition = repetition, seed = seed,
-              max_nonzeros = 3e7, lp_time_limit = time_limit,
-              wall_limit = 3 * time_limit + 120)
-  result <- bf_measure(job, experiment_functions())
-  # Preserve identifiers even if a process stops before its first checkpoint.
-  result$Omega_size <- n
-  result$repetition <- repetition
-  result$seed <- seed
-  result
-}
-```
-
-For example, the following runs one instance on a five-element frame.
-The full set of returned fields is available in result.
-
-``` r
-result <- run_instance(n = 5)
-result[c("successful", "seconds_three_LPs", "peak_RSS_MiB",
-         "focal_L1", "focal_HD", "focal_CW")]
-```
-
-## 5. Repeat the experiment
-
-For n = 5,…,10, we use 20 independently seeded inputs per size. For n =
-11,…,15 and 20, we use one input per size and a 180-second limit per LP.
-These larger cases are exploratory probes, not a universal dimension
-limit. Success or failure also depends on the generated counts.
-
-The small examples reuse compute_table() and compute_vertex_minima(),
-with five repetitions per task. The same process-level measurement is
-used for all experiments.
-
-``` r
-benchmark_frames <- function(sizes, repetitions = 20L, exploratory = FALSE) {
-  jobs <- expand.grid(repetition = seq_len(repetitions), n = sizes)
-  records <- lapply(seq_len(nrow(jobs)), function(i) {
-    n <- jobs$n[i]
-    r <- jobs$repetition[i]
-    seed <- 20260826L + if (exploratory) n else 1000L * n + r
-    run_instance(n, r, seed, time_limit = if (exploratory) 180 else 60)
-  })
-  combine_results(records)
-}
-
-benchmark_small <- function(repetitions = 5L) {
-  inputs <- list(
-    ternary = list(Omega = Omega3, g = g_ternary, nv = row1$all_vertices),
-    modified = list(Omega = Omega3, g = g_ternary_tilde, nv = row2$all_vertices),
-    quaternary = list(Omega = Omega4, g = g5_vals, nv = row3$all_vertices))
-  jobs <- expand.grid(repetition = seq_len(repetitions),
-                      task = c("LP_UAP", "vertices"), example = names(inputs),
-                      stringsAsFactors = FALSE)
-  records <- lapply(seq_len(nrow(jobs)), function(i) {
-    job <- as.list(jobs[i, ])
-    input <- inputs[[job$example]]
-    job <- c(job, list(kind = "small", Omega = input$Omega, g = input$g,
-                      expected_vertices = input$nv, wall_limit = 120))
-    result <- bf_measure(job, experiment_functions())
-    result$example <- job$example
-    result$task <- job$task
-    result$repetition <- job$repetition
-    result
-  })
-  combine_results(records)
-}
-```
-
-The following summaries use median \[maximum\] for times and per-process
-memory peaks. Failed or guarded runs are not included in
-successful-solve time and focal-count summaries. Their observed memory
-remains reported. A missing three-LP time means that the full
-calculation did not finish; the memory observed before a stop is not the
-memory required to finish.
-
-``` r
-bf_pair <- function(x, digits = 3L) {
-  if (!length(x) || all(is.na(x))) return("--")
-  sprintf(paste0("%.", digits, "f [%.", digits, "f]"),
-          median(x, na.rm = TRUE), max(x, na.rm = TRUE))
-}
-summarise_small <- function(small_r) {
-  small_table_r <- do.call(rbind, lapply(split(small_r,
-      interaction(small_r$example, small_r$task, drop = TRUE)), function(d) {
-    data.frame(Example = d$example[1], Task = d$task[1],
-      Success = paste0(sum(d$successful), "/", nrow(d)),
-      "Time (s)" = bf_pair(d$seconds_total[d$successful]),
-      "Peak RSS (MiB)" = bf_pair(d$peak_RSS_MiB, 1),
-      "Peak commit (MiB)" = bf_pair(d$peak_commit_MiB, 1),
-      check.names = FALSE)
-  }))
-  small_table_r <- small_table_r[order(
-    match(small_table_r$Example, c("ternary", "modified", "quaternary")),
-    match(small_table_r$Task, c("LP_UAP", "vertices"))), ]
-  small_table_r$Example <- c(ternary = "Original ternary",
-    modified = "Modified ternary", quaternary = "Quaternary")[small_table_r$Example]
-  small_table_r
-}
-
-summarise_scaling <- function(scaling_r) {
-  scaling_table_r <- do.call(rbind, lapply(split(scaling_r,
-      factor(scaling_r$Omega_size, levels = sort(unique(scaling_r$Omega_size)))), function(d) {
-    ok <- d$successful
-    data.frame(n = d$Omega_size[1], Variables = d$variables[1],
-      "Mean rows" = round(mean(d$dominance_constraints), 1),
-      Success = paste0(sum(ok), "/", nrow(d)),
-      "LP time (s)" = bf_pair(d$seconds_three_LPs[ok]),
-      "Peak RSS (MiB)" = bf_pair(d$peak_RSS_MiB, 1),
-      "Focals L1/HD/CW" = if (any(ok)) sprintf("%.1f/%.1f/%.1f",
-        mean(d$focal_L1[ok]), mean(d$focal_HD[ok]), mean(d$focal_CW[ok])) else "--",
-      check.names = FALSE)
-  }))
-  scaling_table_r
-}
-
-summarise_boundary <- function(boundary_r) {
-  data.frame(
-    n = boundary_r$Omega_size, Variables = boundary_r$variables,
-    Constraints = boundary_r$dominance_constraints,
-    Nonzeros = boundary_r$dominance_nonzeros,
-    "Matrix estimate (MiB)" = round(boundary_r$estimated_matrix_MiB, 1),
-    "LP time (s)" = ifelse(is.na(boundary_r$seconds_three_LPs), "--",
-                           sprintf("%.1f", boundary_r$seconds_three_LPs)),
-    "Observed wall (s)" = round(boundary_r$wall_seconds, 1),
-    "Peak RSS (MiB)" = round(boundary_r$peak_RSS_MiB, 1),
-    "Peak commit (MiB)" = round(boundary_r$peak_commit_MiB, 1),
-    Outcome = boundary_r$outcome, check.names = FALSE)
-}
-```
-
-## 6. Display the results
-
-The measured tables below are included directly in this document. They
-use R 4.3.2, lpSolve 5.6.23, rcdd 1.6 and highs 1.9.0-1 on Windows.
-Times and memory depend on the computer and its load. Fixed seeds
-reproduce the inputs; a different solver version can choose another
-point of the same optimal face.
-
-Set run_benchmarks to TRUE in the execution block below to replace these
-tables with fresh measurements. The additional packages for this step
-are highs, Matrix, callr and ps. The small worked examples need only the
-packages loaded earlier.
-
-<details>
-<summary>
-Recorded measurements used for the displayed tables
-</summary>
-
-``` r
-recorded <- list(
-  small = read.table(header = TRUE, sep = "|", check.names = FALSE, text = "
-Example|Task|Success|Time (s)|Peak RSS (MiB)|Peak commit (MiB)
-Original ternary|LP_UAP|5/5|0.147 [0.240]|75.3 [75.4]|97.4 [97.5]
-Original ternary|vertices|5/5|0.012 [0.033]|75.3 [75.3]|97.5 [97.5]
-Modified ternary|LP_UAP|5/5|0.141 [0.170]|75.3 [75.3]|97.4 [97.5]
-Modified ternary|vertices|5/5|0.009 [0.012]|75.3 [75.4]|97.4 [97.5]
-Quaternary|LP_UAP|5/5|0.105 [0.121]|75.3 [75.4]|97.5 [97.7]
-Quaternary|vertices|5/5|4.951 [6.090]|107.5 [107.6]|131.0 [131.1]"),
-  scaling = read.table(header = TRUE, sep = "|", check.names = FALSE, text = "
-n|Variables|Mean rows|Success|LP time (s)|Peak RSS (MiB)|Focals L1/HD/CW
-5|32|27.4|20/20|0.021 [0.042]|175.0 [176.7]|21.8/21.5/20.3
-6|64|57.5|20/20|0.014 [0.016]|174.9 [176.7]|33.5/32.0/30.2
-7|128|105.7|20/20|0.023 [0.037]|174.8 [175.0]|48.4/44.9/40.2
-8|256|226.8|20/20|0.065 [0.080]|176.4 [178.0]|71.7/61.8/53.9
-9|512|356.2|20/20|0.115 [0.280]|179.6 [185.9]|89.3/77.0/64.2
-10|1024|662.5|20/20|0.586 [1.277]|193.0 [204.2]|110.0/90.6/76.5"),
-  boundary = read.table(header = TRUE, sep = "|", check.names = FALSE, text = "
-n|Variables|Constraints|Nonzeros|Matrix estimate (MiB)|LP time (s)|Observed wall (s)|Peak RSS (MiB)|Peak commit (MiB)|Outcome
-11|2048|2046|175098|2.0|6.0|7.5|249.8|377.7|solved
-12|4096|2214|283516|3.3|11.3|12.9|287.9|463.9|solved
-13|8192|2790|579286|6.7|25.1|27.5|316.3|522.4|solved
-14|16384|16382|4766584|54.6|--|4.4|674.3|1576.1|process_memory_limit
-15|32768|9883|4351334|49.9|--|5.9|632.2|1248.9|process_memory_limit
-20|1048576|275642|709297932|8121.3|--|2.7|262.2|286.9|matrix_limit"))
-```
-
-</details>
-
-Before a full rerun, we check that the sparse and dense LPs give the
-same objective values on small inputs. This also checks the subset-sum
-transform and the special treatment of the empty set. Different mass
-vectors can be equally optimal.
-
-<details>
-<summary>
-Small-case consistency checks
-</summary>
-
-``` r
-bf_validate <- function() {
-  for (n in 3:5) {
-    input <- bf_generate(n, 700L + n)
-    masks <- 0:(2^n - 1L)
-    dense <- outer(masks, masks, function(a, b) bitwAnd(a, b) == b) * 1
-    stopifnot(max(abs(bf_zeta(input$counts, n) -
-                        as.vector(dense %*% input$counts))) == 0)
-    rows <- bf_keep_rows(input$successes, n)
-    sparse <- bf_sparse_matrix(rows, input$card, 2^n)
-    stopifnot(identical(unname(as.matrix(sparse)),
-                        unname(dense[rows + 1L, , drop = FALSE])))
-    A <- rbind(sparse, Matrix::Matrix(1, 1, 2^n, sparse = TRUE))
-    for (obj in bf_objectives(input$card, n)) {
-      fit <- highs::highs_solve(
-        L = obj, lower = 0, upper = c(0, rep(Inf, 2^n - 1L)),
-        A = A, lhs = c(input$g[rows + 1L], 1),
-        rhs = c(rep(Inf, length(rows)), 1),
-        control = highs::highs_control(threads = 1L,
-          primal_feasibility_tolerance = 1e-9,
-          dual_feasibility_tolerance = 1e-9))
-      reference <- lpSolve::lp("min", obj,
-        rbind(dense, rep(1, 2^n), c(1, rep(0, 2^n - 1L))),
-        c(rep(">=", 2^n), "=", "="), c(input$g, 1, 0))
-      stopifnot(fit$status_message == "Optimal", reference$status == 0L,
-                bf_violation(fit$primal_solution, input$g, n) < 1e-7,
-                abs(fit$objective_value - reference$objval) < 1e-6)
-    }
-  }
-  stopifnot(identical(bf_keep_rows(integer(8L), 3L), c(1L, 2L, 4L)))
-  TRUE
-}
-```
-
-</details>
-
-``` r
-# Change FALSE to TRUE to run all benchmarks.
-# The option also allows a full run without editing this line.
-run_benchmarks <- getOption("bf.run_benchmarks", FALSE)
-
-if (run_benchmarks) {
-  # Install once if needed: install.packages(c("highs", "Matrix", "callr", "ps"))
+if (run_scaling_experiment) {
   library(highs)
   library(Matrix)
-  library(callr)
-  library(ps)
-  stopifnot(bf_validate())
-  small_r <- benchmark_small(repetitions = 5)
-  scaling_r <- benchmark_frames(5:10, repetitions = 20)
-  boundary_r <- benchmark_frames(c(11:15, 20), repetitions = 1,
-                                  exploratory = TRUE)
-  tables <- list(small = summarise_small(small_r),
-                 scaling = summarise_scaling(scaling_r),
-                 boundary = summarise_boundary(boundary_r))
-} else {
-  tables <- recorded
+
+  results <- list()
+
+  for (n in 5:13) {
+    repetitions <- if (n <= 10) 20 else 5
+    time_limit <- 60
+
+    for (repetition in seq_len(repetitions)) {
+      cat("|Omega| =", n, ", repetition", repetition, "/", repetitions, "\n")
+
+      row <- list(
+        Omega = n, repetition = repetition,
+        seed = n * 100 + repetition,
+        k = NA_integer_, success = FALSE, status = "preparing",
+        R_preparation_seconds = NA_real_,
+        L1_seconds = NA_real_, HD_seconds = NA_real_, CW_seconds = NA_real_,
+        three_HiGHS_calls_seconds = NA_real_,
+        R_memory_MiB = NA_real_)
+
+      # Remove objects left by the previous iteration.
+      data <- rows <- A <- objectives <- solutions <- NULL
+      gc()
+      memory_before <- sum(gc(reset = TRUE)[, 2])
+
+      total_time <- system.time(tryCatch({
+        data <- generate_data(n, row$seed)
+        row$k <- data$k
+
+        row$R_preparation_seconds <- unname(system.time({
+          successes <- subset_sums(data$counts, n)
+          lower <- jeffreys_interval(0:200, 200, 0.05)$lower
+          g <- lower[successes + 1L]
+          g[c(1L, length(g))] <- c(0, 1)
+
+          rows <- 1:(2^n - 2L)
+          nonzeros <- sum(2^data$card[rows + 1L])
+          if (nonzeros > 1e8)
+            stop("matrix has more than 100 million nonzeros")
+
+          A <- rbind(
+            sparse_subset_matrix(rows, data$card, 2^n),
+            Matrix::Matrix(1, nrow = 1L, ncol = 2^n, sparse = TRUE))
+          lhs <- c(g[rows + 1L], 1)
+          rhs <- c(rep(Inf, length(rows)), 1)
+          upper <- c(0, rep(Inf, 2^n - 1L))
+          objectives <- list(
+            L1 = objective_L1(data$card, seq_len(n)),
+            HD = objective_HD(data$card, seq_len(n)),
+            CW = objective_CW(data$card, seq_len(n)))
+        })[["elapsed"]])
+
+        solutions <- list()
+        solver_status <- character()
+        for (criterion in names(objectives)) {
+          row[[paste0(criterion, "_seconds")]] <- unname(system.time({
+            fit <- highs::highs_solve(
+              L = objectives[[criterion]], lower = 0, upper = upper,
+              A = A, lhs = lhs, rhs = rhs,
+              control = highs::highs_control(
+                threads = 1L, time_limit = time_limit))
+          })[["elapsed"]])
+          solver_status[criterion] <- fit$status_message
+          if (fit$status_message == "Optimal")
+            solutions[[criterion]] <- fit$primal_solution
+        }
+        row$three_HiGHS_calls_seconds <-
+          row$L1_seconds + row$HD_seconds + row$CW_seconds
+
+        row$success <- all(solver_status == "Optimal")
+        row$status <- if (row$success) "solved" else
+          paste(names(solver_status), solver_status, collapse = "; ")
+      }, error = function(e) {
+        row$status <<- if (grepl("100 million", conditionMessage(e)))
+          "matrix too large" else conditionMessage(e)
+      }))
+
+      memory_after <- gc()
+      row$R_memory_MiB <- max(0, sum(memory_after[, 6]) - memory_before)
+      row$total_seconds <- unname(total_time[["elapsed"]])
+
+      results[[length(results) + 1L]] <- as.data.frame(row)
+      results_data <- do.call(rbind, results)
+      write.csv(results_data, "results.csv", row.names = FALSE)
+      cat("  ", row$status, "\n")
+    }
+  }
 }
 ```
 
-### Small examples
+## Summarize the results
+
+The final chunk groups result rows by $|\Omega|$. Each numerical cell
+contains the arithmetic mean followed by the maximum in square brackets.
+Optimization averages use completed runs; preparation and memory use all
+attempts.
 
 ``` r
-knitr::kable(tables$small, row.names = FALSE,
-  caption = "Five fresh processes per task; median [maximum] time and peak memory.")
+if (file.exists("results.csv")) {
+  results_data <- read.csv("results.csv")
+
+  mean_max <- function(x, digits = 3) {
+    if (!length(x) || all(is.na(x))) return("--")
+    sprintf(paste0("%.", digits, "f [%.", digits, "f]"),
+            mean(x, na.rm = TRUE), max(x, na.rm = TRUE))
+  }
+
+  table_rows <- list()
+  for (n in sort(unique(results_data$Omega))) {
+    d <- results_data[results_data$Omega == n, ]
+    completed <- d$success
+
+    failed_status <- d$status[!completed]
+    failure_text <- if (!length(failed_status)) "--" else
+      if (all(grepl("Time limit reached", failed_status)))
+        paste0("time limit (", length(failed_status), ")") else
+        paste(names(table(failed_status)), table(failed_status), collapse = "; ")
+
+    table_rows[[length(table_rows) + 1L]] <- data.frame(
+      "$|\\Omega|$" = n,
+      Success = paste0(sum(completed), "/", nrow(d)),
+      "R preparation (s)" = mean_max(d$R_preparation_seconds),
+      "L1 (s)" = mean_max(d$L1_seconds[completed]),
+      "HD (s)" = mean_max(d$HD_seconds[completed]),
+      "CW (s)" = mean_max(d$CW_seconds[completed]),
+      "R memory (MiB)" = mean_max(d$R_memory_MiB, digits = 1),
+      Failures = failure_text,
+      check.names = FALSE)
+  }
+  results_table <- do.call(rbind, table_rows)
+
+  write.csv(results_table, "summary.csv", row.names = FALSE)
+
+  knitr::kable(results_table, row.names = FALSE,
+    caption = "Arithmetic mean [maximum] over generated data sets.")
+
+  latex_table <- as.character(knitr::kable(
+    results_table, format = "latex", row.names = FALSE,
+    align = "ccrrrrrl", escape = FALSE))
+  writeLines(c("{\\color{red}", "\\begin{table}[ht]",
+    "\\centering\\color{red}\\scriptsize",
+    "\\caption{Scaling experiment using HiGHS. Arithmetic mean [maximum].}",
+    "\\label{tab:scaling-experiment}",
+    "\\resizebox{\\textwidth}{!}{%", latex_table, "}",
+    "\\end{table}", "}"),
+    "table_resources_frames.tex")
+}
 ```
 
-| Example | Task | Success | Time (s) | Peak RSS (MiB) | Peak commit (MiB) |
-|:---|:---|:---|:---|:---|:---|
-| Original ternary | LP_UAP | 5/5 | 0.147 \[0.240\] | 75.3 \[75.4\] | 97.4 \[97.5\] |
-| Original ternary | vertices | 5/5 | 0.012 \[0.033\] | 75.3 \[75.3\] | 97.5 \[97.5\] |
-| Modified ternary | LP_UAP | 5/5 | 0.141 \[0.170\] | 75.3 \[75.3\] | 97.4 \[97.5\] |
-| Modified ternary | vertices | 5/5 | 0.009 \[0.012\] | 75.3 \[75.4\] | 97.4 \[97.5\] |
-| Quaternary | LP_UAP | 5/5 | 0.105 \[0.121\] | 75.3 \[75.4\] | 97.5 \[97.7\] |
-| Quaternary | vertices | 5/5 | 4.951 \[6.090\] | 107.5 \[107.6\] | 131.0 \[131.1\] |
-
-Five fresh processes per task; median \[maximum\] time and peak memory.
-
-### Twenty random inputs per frame size
-
-``` r
-knitr::kable(tables$scaling, row.names = FALSE,
-  caption = "Twenty instances per frame size; median [maximum] time and peak RSS.")
-```
-
-| n | Variables | Mean rows | Success | LP time (s) | Peak RSS (MiB) | Focals L1/HD/CW |
-|---:|---:|---:|:---|:---|:---|:---|
-| 5 | 32 | 27.4 | 20/20 | 0.021 \[0.042\] | 175.0 \[176.7\] | 21.8/21.5/20.3 |
-| 6 | 64 | 57.5 | 20/20 | 0.014 \[0.016\] | 174.9 \[176.7\] | 33.5/32.0/30.2 |
-| 7 | 128 | 105.7 | 20/20 | 0.023 \[0.037\] | 174.8 \[175.0\] | 48.4/44.9/40.2 |
-| 8 | 256 | 226.8 | 20/20 | 0.065 \[0.080\] | 176.4 \[178.0\] | 71.7/61.8/53.9 |
-| 9 | 512 | 356.2 | 20/20 | 0.115 \[0.280\] | 179.6 \[185.9\] | 89.3/77.0/64.2 |
-| 10 | 1024 | 662.5 | 20/20 | 0.586 \[1.277\] | 193.0 \[204.2\] | 110.0/90.6/76.5 |
-
-Twenty instances per frame size; median \[maximum\] time and peak RSS.
-
-### Exploratory larger frames
-
-``` r
-knitr::kable(tables$boundary, row.names = FALSE,
-  caption = "One instance per size. Memory guards and pre-allocation skips are reported separately.")
-```
-
-| n | Variables | Constraints | Nonzeros | Matrix estimate (MiB) | LP time (s) | Observed wall (s) | Peak RSS (MiB) | Peak commit (MiB) | Outcome |
-|---:|---:|---:|---:|---:|:---|---:|---:|---:|:---|
-| 11 | 2048 | 2046 | 175098 | 2.0 | 6.0 | 7.5 | 249.8 | 377.7 | solved |
-| 12 | 4096 | 2214 | 283516 | 3.3 | 11.3 | 12.9 | 287.9 | 463.9 | solved |
-| 13 | 8192 | 2790 | 579286 | 6.7 | 25.1 | 27.5 | 316.3 | 522.4 | solved |
-| 14 | 16384 | 16382 | 4766584 | 54.6 | – | 4.4 | 674.3 | 1576.1 | process_memory_limit |
-| 15 | 32768 | 9883 | 4351334 | 49.9 | – | 5.9 | 632.2 | 1248.9 | process_memory_limit |
-| 20 | 1048576 | 275642 | 709297932 | 8121.3 | – | 2.7 | 262.2 | 286.9 | matrix_limit |
-
-One instance per size. Memory guards and pre-allocation skips are
-reported separately.
-
-In the recorded run, all 120 scaling instances were solved and
-validated. Three different mass vectors were obtained in 117 cases; in
-three cases some objectives selected the same vector. The larger probes
-completed through n = 13. The n = 14 and n = 15 probes reached the
-process-memory guard. For n = 20, the estimated storage of one dominance
-matrix alone was 7.93 GiB, so the matrix was not allocated.
-
-These observations concern the recorded inputs and resource limits, not
-an intrinsic limit on frame size. In particular, a guarded run does not
-imply that a dominating belief function does not exist. On rerunning the
-experiment, read the outcome columns rather than assuming the same
-stopping points.
-
-``` r
-cat("```text\n",
-    paste(trimws(capture.output(sessionInfo()), which = "right"), collapse = "\n"),
-    "\n```\n", sep = "")
-```
-
-``` text
-R version 4.3.2 (2023-10-31 ucrt)
-Platform: x86_64-w64-mingw32/x64 (64-bit)
-Running under: Windows 11 x64 (build 26200)
-
-Matrix products: default
-
-
-locale:
-[1] C
-system code page: 65001
-
-time zone: Europe/Prague
-tzcode source: internal
-
-attached base packages:
-[1] stats     graphics  grDevices utils     datasets  methods   base
-
-other attached packages:
-[1] rcdd_1.6       knitr_1.50     lpSolve_5.6.23
-
-loaded via a namespace (and not attached):
- [1] compiler_4.3.2  fastmap_1.2.0   cli_3.6.5       tools_4.3.2
- [5] htmltools_0.5.9 yaml_2.3.11     rmarkdown_2.30  xfun_0.54
- [9] digest_0.6.39   rlang_1.1.6     evaluate_1.0.5
-```
+The experiment is deliberately simple. Its purpose is to illustrate how
+calculation time and R-managed memory grow with $|\Omega|$. A failed
+allocation or a solver time limit is not evidence that the feasible
+polytope is empty.
