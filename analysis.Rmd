@@ -1452,10 +1452,3 @@ if (file.exists("results.csv")) {
 The experiment is deliberately simple. Its purpose is to illustrate how
 calculation time and R-managed memory grow with $|\Omega|$. A failed allocation
 or a solver time limit is not evidence that the feasible polytope is empty.
-
-```{r session-information, results='asis'}
-cat("```text\n",
-    paste(trimws(capture.output(sessionInfo()), which = "right"), collapse = "\n"),
-    "\n```\n", sep = "")
-
-```

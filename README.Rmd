@@ -8,7 +8,7 @@ output: github_document
 
 This repository accompanies the paper *From Confidence Bounds to Belief
 Functions*, submitted to **Kybernetika**. Its main file is
-[`analysis.Rmd`](analysis.Rmd), a self-contained and executable account of the
+[`analysis.Rmd`](analysis.md), a self-contained and executable account of the
 worked examples, polyhedral calculations, and scaling experiment reported in
 the paper. The explanations and the R code are kept together so that a reader
 can follow the construction step by step and reproduce individual results in
