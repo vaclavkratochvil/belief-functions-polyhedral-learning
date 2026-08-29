@@ -39,7 +39,7 @@ probability assignment. This gives an H-representation of the feasible
 polytope
 
 \[
-\mathcal M_g=\{m:\operatorname{Bel}_m(A)\geq g(A),\ m\geq0,\
+\mathcal M_g=\{m:\mathrm{Bel}_m(A)\geq g(A),\ m\geq0,\
 m(\emptyset)=0,\ \sum_A m(A)=1\}.
 \]
 

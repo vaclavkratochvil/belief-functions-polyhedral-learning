@@ -659,12 +659,12 @@ the feasible region becomes a **polytope** in \(\mathbb{R}^{2^{|\Omega|}}\),
 described entirely by linear inequalities:
 
 \[
-\mathcal{M}_g = \bigl\{ m \,\mid\, 
+\mathcal{M}_g = \{ m \,\mid\,
 \mathbf{M}_{\mathrm{bel}}\, m \ge g,\;
 m \ge 0,\;
 m(\emptyset)=0,\;
 \sum_A m(A)=1
-\bigr\}.
+\}.
 \]
 
 Here, \(\mathbf{M}_{\mathrm{bel}}\) is the *incidence matrix* of the subset lattice:
