@@ -1202,7 +1202,7 @@ knitr::kable(
 
 Direct LP calculations for the examples with $|\Omega|=3,4$ are very fast.
 We therefore use generated data to see how the sparse LP formulation behaves
-for $|\Omega|=5,\ldots,13$. This is an illustration, not a general benchmark.
+for $|\Omega|=5,\ldots,14$. This is an illustration, not a general benchmark.
 
 All scaling calculations use HiGHS. The constraint
 $\sum_{B\subseteq A}m(B)\geq g(A)$ has a zero coefficient whenever
@@ -1280,15 +1280,20 @@ sparse_subset_matrix <- function(rows, card, n_variables) {
 
 Set `run_scaling_experiment` to TRUE and run this chunk.
 For each $|\Omega|=5,\ldots,10$ there are 20 data sets; for
-$|\Omega|=11,12,13$ there are five. Since none of the five calculations for
-$|\Omega|=13$ finished within the time limit, larger frames were not attempted.
+$|\Omega|=11,12,13,14$ there are five. The time limit is 300 seconds per LP
+for every frame size. None of the five calculations for
+$|\Omega|=14$ finished within this limit, and larger frames were not attempted.
 
 The code follows the calculation in its natural order: generate counts,
 calculate Jeffreys bounds, build the sparse matrix, solve the three LPs,
 and save one result row. Elapsed times are measured with `system.time()`.
 For a simple memory indication, `gc(reset=TRUE)` resets R's memory counter
 before each data set; the reported value is the subsequent increase in maximum
-memory managed by R. It does not include memory allocated internally by HiGHS.
+memory managed by R. This deliberately simple measure depends on when garbage
+collection occurs, whether R reuses previously allocated memory, and one-time
+allocations in the first runs. It also excludes memory allocated internally by
+HiGHS. Fluctuations between runs should therefore not be overinterpreted; the
+column is intended only to show the overall growth trend.
 
 There is no process monitor or memory guard. The only fixed check avoids
 allocating a matrix with more than 100 million nonzeros.
@@ -1302,9 +1307,9 @@ if (run_scaling_experiment) {
 
   results <- list()
 
-  for (n in 5:13) {
+  for (n in 5:14) {
     repetitions <- if (n <= 10) 20 else 5
-    time_limit <- 60
+    time_limit <- 300
 
     for (repetition in seq_len(repetitions)) {
       cat("|Omega| =", n, ", repetition", repetition, "/", repetitions, "\n")
@@ -1411,21 +1416,13 @@ if (file.exists("results.csv")) {
     d <- results_data[results_data$Omega == n, ]
     completed <- d$success
 
-    failed_status <- d$status[!completed]
-    failure_text <- if (!length(failed_status)) "--" else
-      if (all(grepl("Time limit reached", failed_status)))
-        paste0("time limit (", length(failed_status), ")") else
-        paste(names(table(failed_status)), table(failed_status), collapse = "; ")
-
     table_rows[[length(table_rows) + 1L]] <- data.frame(
       "$|\\Omega|$" = n,
-      Success = paste0(sum(completed), "/", nrow(d)),
       "R preparation (s)" = mean_max(d$R_preparation_seconds),
       "L1 (s)" = mean_max(d$L1_seconds[completed]),
       "HD (s)" = mean_max(d$HD_seconds[completed]),
       "CW (s)" = mean_max(d$CW_seconds[completed]),
       "R memory (MiB)" = mean_max(d$R_memory_MiB, digits = 1),
-      Failures = failure_text,
       check.names = FALSE)
   }
   results_table <- do.call(rbind, table_rows)
@@ -1437,10 +1434,10 @@ if (file.exists("results.csv")) {
 
   latex_table <- as.character(knitr::kable(
     results_table, format = "latex", row.names = FALSE,
-    align = "ccrrrrrl", escape = FALSE))
+    align = "crrrrr", escape = FALSE))
   writeLines(c("{\\color{red}", "\\begin{table}[ht]",
     "\\centering\\color{red}\\scriptsize",
-    "\\caption{Scaling experiment using HiGHS. Arithmetic mean [maximum].}",
+    "\\caption{Scaling experiment using HiGHS. Arithmetic mean [maximum]; dashes indicate that no run finished within the time limit.}",
     "\\label{tab:scaling-experiment}",
     "\\resizebox{\\textwidth}{!}{%", latex_table, "}",
     "\\end{table}", "}"),

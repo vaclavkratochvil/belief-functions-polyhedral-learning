@@ -67,23 +67,26 @@ illustrates how far the LP formulation can be taken on a standard
 computer. All scaling calculations use **HiGHS** and sparse matrices.
 
 For each $|\Omega|=5,\ldots,10$, the experiment generates 20 data sets.
-For each $|\Omega|=11,12,13$, it generates five. Every data set contains
+For each $|\Omega|=11,12,13,14$, it generates five. Every data set contains
 200 observations distributed among all singletons and $k$ randomly
 selected nonsingleton subsets, where $k$ is sampled separately for every
 data set. Every selected subset first receives at least one observation;
 the remaining observations are allocated multinomially.
 
-All calculations through $|\Omega|=12$ finished. None of the five
-calculations for $|\Omega|=13$ finished within the 60-second limit per
-LP; larger frames were therefore not attempted in this study.
+The time limit was 300 seconds for every LP and every frame size. All
+calculations through $|\Omega|=13$ finished. None of the five calculations for
+$|\Omega|=14$ finished within this limit; larger frames were not attempted.
 
 For every data set, the code constructs Jeffreys lower bounds, prepares
 the sparse dominance matrix, and solves the L1, HD, and CW programs.
 Preparation time and the three optimization times are measured
 separately with `system.time()`. Their sum is also retained in
 `results.csv`. The memory column is a simple R-managed-memory indicator
-obtained with `gc(reset = TRUE)`; it does not include memory allocated
-internally by HiGHS. The final chunk groups the measurements by
+obtained with `gc(reset = TRUE)`. Its fluctuations reflect
+garbage-collection timing, reuse of allocated memory, and one-time
+allocations; it also excludes memory allocated internally by HiGHS. It
+is therefore useful for the overall growth trend, not for precise
+run-to-run comparisons. The final chunk groups the measurements by
 $|\Omega|$ and reports arithmetic mean and maximum.
 
 # Running the supplement
